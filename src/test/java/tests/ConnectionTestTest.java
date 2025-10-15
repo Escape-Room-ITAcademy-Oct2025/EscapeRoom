@@ -1,4 +1,4 @@
-package com.escaperoom.tests;
+package tests;
 
 import config.DatabaseConfig;
 import org.junit.jupiter.api.Test;
