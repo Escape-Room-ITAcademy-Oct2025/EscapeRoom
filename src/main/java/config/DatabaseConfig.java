@@ -1,4 +1,4 @@
-package com.escaperoom.config;
+package config;
 
 import java.io.InputStream;
 import java.sql.Connection;

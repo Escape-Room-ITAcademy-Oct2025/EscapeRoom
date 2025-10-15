@@ -1,6 +1,6 @@
 package com.escaperoom.tests;
 
-import com.escaperoom.config.DatabaseConfig;
+import config.DatabaseConfig;
 import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,6 +1,6 @@
-package com.escaperoom.app;
+package app;
 
-import com.escaperoom.config.DatabaseConfig;
+import config.DatabaseConfig;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

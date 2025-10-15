@@ -19,7 +19,7 @@ mvn clean test
 
 ### 3. Run the main app
 ```bash
-mvn exec:java -Dexec.mainClass="com.escaperoom.app.Main"
+mvn exec:java -Dexec.mainClass="app.Main"
 ```
 
 ---
