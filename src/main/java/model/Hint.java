@@ -4,15 +4,15 @@ public class Hint {
     private int id;
     private String description;
     private HintType hintType;
-    private double cost;
     private int roomId;
+    private double price;
 
-    public Hint(int id, String description, HintType hintType, double cost, int roomId) {
+    public Hint(int id, String description, HintType hintType, int roomId, double price) {
         this.id = id;
         this.description = description;
         this.hintType = hintType;
-        this.cost = cost;
         this.roomId = roomId;
+        this.price = price;
     }
 
     public int getId() {
@@ -27,12 +27,12 @@ public class Hint {
         return hintType;
     }
 
-    public double getCost() {
-        return cost;
-    }
-
     public int getRoomId() {
         return roomId;
+    }
+
+    public double getPrice(){
+        return price;
     }
 
     public void setId(int id) {
@@ -47,12 +47,12 @@ public class Hint {
         this.hintType = hintType;
     }
 
-    public void setCost(double cost) {
-        this.cost = cost;
-    }
-
     public void setRoomId(int roomId) {
         this.roomId = roomId;
+    }
+
+    public void setPrice(double price){
+        this.price = price;
     }
 
     @Override
@@ -61,7 +61,6 @@ public class Hint {
                 ", id=" + id +
                 ", description='" + description + '\'' +
                 ", type=" + hintType +
-                ", cost=" + cost +
                 ", roomId=" + roomId;
     }
 }
