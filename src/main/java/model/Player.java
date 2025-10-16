@@ -1,9 +1,17 @@
 package model;
 
+/**
+ * Representa un jugador del Escape Room.
+ */
 public class Player {
+
     private int id;
     private String name;
     private String email;
+
+    // ----- Constructors -----
+    public Player() {
+    }
 
     public Player(int id, String name, String email) {
         this.id = id;
@@ -11,24 +19,30 @@ public class Player {
         this.email = email;
     }
 
+    public Player(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    // ----- Getters & Setters -----
     public int getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
@@ -37,8 +51,10 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player id: " + id + '\'' +
-                "Player Name: " + name +
-                "Player email: " + email;
+        return "Player{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }
