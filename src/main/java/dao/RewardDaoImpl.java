@@ -4,10 +4,12 @@ import config.DatabaseConfig;
 import model.Reward;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementación del DAO para la entidad Reward.
+ */
 public class RewardDaoImpl implements GenericDao<Reward> {
 
     private Connection getConnection() throws SQLException {
@@ -16,12 +18,13 @@ public class RewardDaoImpl implements GenericDao<Reward> {
 
     @Override
     public void save(Reward reward) {
-        String sql = "INSERT INTO reward (player_id, date, description) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO reward (player_id, name, description) VALUES (?, ?, ?)";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, reward.getPlayerId());
-            stmt.setDate(2, Date.valueOf(reward.getDate()));
+            stmt.setString(2, reward.getName());
             stmt.setString(3, reward.getDescription());
             stmt.executeUpdate();
 
@@ -32,12 +35,13 @@ public class RewardDaoImpl implements GenericDao<Reward> {
             }
 
         } catch (SQLException e) {
+            System.err.println("Error inserting reward: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @Override
-    public List<Reward> getAll() {
+    public List<Reward> findAll() {
         List<Reward> rewards = new ArrayList<>();
         String sql = "SELECT * FROM reward";
 
@@ -49,13 +53,15 @@ public class RewardDaoImpl implements GenericDao<Reward> {
                 Reward reward = new Reward(
                         rs.getInt("id"),
                         rs.getInt("player_id"),
-                        rs.getDate("date").toLocalDate(),
-                        rs.getString("description")
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getTimestamp("date_awarded").toLocalDateTime()
                 );
                 rewards.add(reward);
             }
 
         } catch (SQLException e) {
+            System.err.println("Error fetching rewards: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -63,8 +69,9 @@ public class RewardDaoImpl implements GenericDao<Reward> {
     }
 
     @Override
-    public Reward getById(int id) {
+    public Reward findById(int id) {
         String sql = "SELECT * FROM reward WHERE id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -74,13 +81,15 @@ public class RewardDaoImpl implements GenericDao<Reward> {
                     return new Reward(
                             rs.getInt("id"),
                             rs.getInt("player_id"),
-                            rs.getDate("date").toLocalDate(),
-                            rs.getString("description")
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getTimestamp("date_awarded").toLocalDateTime()
                     );
                 }
             }
 
         } catch (SQLException e) {
+            System.err.println("Error finding reward: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -90,6 +99,7 @@ public class RewardDaoImpl implements GenericDao<Reward> {
     @Override
     public void remove(Reward reward) {
         String sql = "DELETE FROM reward WHERE id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -97,6 +107,7 @@ public class RewardDaoImpl implements GenericDao<Reward> {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
+            System.err.println("Error deleting reward: " + e.getMessage());
             e.printStackTrace();
         }
     }

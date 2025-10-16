@@ -4,7 +4,7 @@ import config.DatabaseConfig;
 import model.Ticket;
 
 import java.sql.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +16,15 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
 
     @Override
     public void save(Ticket ticket) {
-        String sql = "INSERT INTO ticket (player_id, room_id, purchase_date, price) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ticket (player_id, room_id, price, purchase_date) VALUES (?, ?, ?, ?)";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, ticket.getPlayerId());
             stmt.setInt(2, ticket.getRoomId());
-            stmt.setDate(3, Date.valueOf(ticket.getPurchaseDate()));
-            stmt.setDouble(4, ticket.getPrice());
+            stmt.setDouble(3, ticket.getPrice());
+            stmt.setTimestamp(4, Timestamp.valueOf(ticket.getPurchaseDate()));
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -33,12 +34,12 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error inserting ticket: " + e.getMessage());
         }
     }
 
     @Override
-    public List<Ticket> getAll() {
+    public List<Ticket> findAll() {
         List<Ticket> tickets = new ArrayList<>();
         String sql = "SELECT * FROM ticket";
 
@@ -51,22 +52,23 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
                         rs.getInt("id"),
                         rs.getInt("player_id"),
                         rs.getInt("room_id"),
-                        rs.getDate("purchase_date").toLocalDate(),
+                        rs.getTimestamp("purchase_date").toLocalDateTime(),
                         rs.getDouble("price")
                 );
                 tickets.add(ticket);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error fetching tickets: " + e.getMessage());
         }
 
         return tickets;
     }
 
     @Override
-    public Ticket getById(int id) {
+    public Ticket findById(int id) {
         String sql = "SELECT * FROM ticket WHERE id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -77,14 +79,14 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
                             rs.getInt("id"),
                             rs.getInt("player_id"),
                             rs.getInt("room_id"),
-                            rs.getDate("purchase_date").toLocalDate(),
+                            rs.getTimestamp("purchase_date").toLocalDateTime(),
                             rs.getDouble("price")
                     );
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error finding ticket: " + e.getMessage());
         }
 
         return null;
@@ -93,6 +95,7 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
     @Override
     public void remove(Ticket ticket) {
         String sql = "DELETE FROM ticket WHERE id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -100,7 +103,7 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error deleting ticket: " + e.getMessage());
         }
     }
 }
