@@ -5,12 +5,14 @@ public class Hint {
     private String description;
     private HintType hintType;
     private int roomId;
+    private double price;
 
-    public Hint(int id, String description, HintType hintType, int roomId) {
+    public Hint(int id, String description, HintType hintType, int roomId, double price) {
         this.id = id;
         this.description = description;
         this.hintType = hintType;
         this.roomId = roomId;
+        this.price = price;
     }
 
     public int getId() {
@@ -29,6 +31,10 @@ public class Hint {
         return roomId;
     }
 
+    public double getPrice(){
+        return price;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -43,6 +49,10 @@ public class Hint {
 
     public void setRoomId(int roomId) {
         this.roomId = roomId;
+    }
+
+    public void setPrice(double price){
+        this.price = price;
     }
 
     @Override

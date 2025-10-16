@@ -49,7 +49,8 @@ public class HintDaoImpl implements GenericDao<Hint> {
                         rs.getInt("id"),
                         rs.getString("description"),
                         Enum.valueOf(model.HintType.class, rs.getString("theme")),
-                        rs.getInt("room_id")
+                        rs.getInt("room_id"),
+                        rs.getDouble("price")
                 );
                 hints.add(hint);
             }
@@ -74,7 +75,8 @@ public class HintDaoImpl implements GenericDao<Hint> {
                             rs.getInt("id"),
                             rs.getString("description"),
                             Enum.valueOf(model.HintType.class, rs.getString("theme")),
-                            rs.getInt("room_id")
+                            rs.getInt("room_id"),
+                            rs.getDouble("price")
                     );
                 }
             }
