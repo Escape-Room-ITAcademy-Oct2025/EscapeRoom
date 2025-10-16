@@ -1,52 +1,43 @@
 package config;
 
-import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Singleton class to manage the database connection.
+ * Configuración de conexión a la base de datos.
+ * Carga las credenciales desde db.properties y permite obtener una conexión JDBC.
  */
-public final class DatabaseConfig {
-    private static volatile DatabaseConfig INSTANCE;
+public class DatabaseConfig {
+
+    private static DatabaseConfig instance;
     private final String url;
     private final String user;
-    private final String pass;
+    private final String password;
 
     private DatabaseConfig() {
-        try (InputStream input = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream("db.properties")) {
-
-            Properties props = new Properties();
-            if (input == null) {
-                throw new IllegalStateException("db.properties file not found in resources folder");
-            }
-
-            props.load(input);
+        Properties props = new Properties();
+        try (FileInputStream fis = new FileInputStream("src/main/resources/db.properties")) {
+            props.load(fis);
             this.url = props.getProperty("db.url");
             this.user = props.getProperty("db.user");
-            this.pass = props.getProperty("db.password");
-
-        } catch (Exception e) {
+            this.password = props.getProperty("db.password");
+        } catch (IOException e) {
             throw new RuntimeException("Error loading database configuration", e);
         }
     }
 
     public static DatabaseConfig getInstance() {
-        if (INSTANCE == null) {
-            synchronized (DatabaseConfig.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new DatabaseConfig();
-                }
-            }
+        if (instance == null) {
+            instance = new DatabaseConfig();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, user, pass);
+        return DriverManager.getConnection(url, user, password);
     }
 }

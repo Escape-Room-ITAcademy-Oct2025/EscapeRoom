@@ -11,16 +11,17 @@ CREATE TABLE room (
 );
 
 -- Clue table
-CREATE TABLE clue (
+CREATE TABLE hint (
     id INT AUTO_INCREMENT PRIMARY KEY,
     description VARCHAR(255) NOT NULL,
     theme VARCHAR(100),
     room_id INT,
+    price DECIMAL(6,2),
     FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE
 );
 
 -- Decoration objects
-CREATE TABLE decoration_object (
+CREATE TABLE decoration (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     material VARCHAR(100),
@@ -64,13 +65,13 @@ INSERT INTO room (name, difficulty, price) VALUES
 ('The Forbidden Forest', 'Easy', 35.00);
 
 -- Sample clues
-INSERT INTO clue (description, theme, room_id) VALUES
-('Use Parseltongue to open the Chamber door.', 'Serpent Magic', 1),
-('Find the Patronus to reveal the exit.', 'Defense Against the Dark Arts', 2),
-('Follow the light of the centaurs.', 'Forest Guidance', 3);
+INSERT INTO hint (description, theme, room_id, price) VALUES
+('Use Parseltongue to open the Chamber door.', 'Serpent Magic', 1, 1.00),
+('Find the Patronus to reveal the exit.', 'Defense Against the Dark Arts', 2, 1.00),
+('Follow the light of the centaurs.', 'Forest Guidance', 3, 1.00);
 
 -- Sample decorations
-INSERT INTO decoration_object (name, material, price, room_id) VALUES
+INSERT INTO decoration (name, material, price, room_id) VALUES
 ('Sorting Hat', 'Cloth', 120.00, 1),
 ('Flying Broom', 'Wood', 250.00, 2),
 ('Golden Snitch', 'Gold', 300.00, 3);
