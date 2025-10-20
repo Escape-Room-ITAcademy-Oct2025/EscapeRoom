@@ -10,10 +10,11 @@ public class AdminMenu {
     private final Scanner scanner;
 
     public AdminMenu() {
-        this.inventoryMenu = new InventoryMenu();
+        this.scanner = new Scanner(System.in);
+        this.inventoryMenu = new InventoryMenu(scanner);
         this.salesMenu = new SalesMenu();
         this.certificateMenu = new CertificateMenu();
-        this.scanner = new Scanner(System.in);
+
     }
 
     public void showMenu() {
@@ -29,7 +30,7 @@ public class AdminMenu {
             option = Integer.parseInt(scanner.nextLine());
 
             switch (option) {
-                case 1 -> inventoryMenu.showMenu();
+                case 1 -> inventoryMenu.start();
                 case 2 -> salesMenu.showMenu();
                 case 3 -> certificateMenu.showMenu();
                 case 0 -> System.out.println("Exiting Admin Menu...");
