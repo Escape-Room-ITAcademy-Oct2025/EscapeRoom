@@ -1,10 +1,8 @@
 package menu;
 
 import service.SalesService;
-import model.Ticket;
+import utils.InputUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class SalesMenu {
@@ -12,67 +10,65 @@ public class SalesMenu {
     private final SalesService salesService;
     private final Scanner scanner;
 
-    public SalesMenu() {
+    public SalesMenu(Scanner scanner) { // ✅ ahora acepta el Scanner
         this.salesService = new SalesService();
-        this.scanner = new Scanner(System.in);
+        this.scanner = scanner;
     }
 
-    public void showMenu() {
+    public void start() {
         int option;
-        do {
-            System.out.println("\n--- Sales Menu ---");
-            System.out.println("1. Show all tickets");
-            System.out.println("2. Find ticket by ID");
-            System.out.println("3. Add new ticket");
-            System.out.println("4. Calculate total revenue");
-            System.out.println("0. Exit");
-            System.out.print("Choose an option: ");
 
-            option = Integer.parseInt(scanner.nextLine());
+        do {
+            printMenuOptions();
+            option = InputUtils.readInt(scanner);
 
             switch (option) {
-                case 1 -> salesService.findAllTickets()
-                        .forEach(ticket -> System.out.println(ticket));
-                case 2 -> {
-                    System.out.print("Enter ticket ID: ");
-                    int id = Integer.parseInt(scanner.nextLine());
-                    Ticket ticket = salesService.findTicketById(id);
-                    System.out.println(ticket != null ? ticket : "Ticket not found");
-                }
-                case 3 -> addNewTicket();
-                case 4 -> {
-                    double totalRevenue = salesService.calculateTotalRevenue();
-                    System.out.printf("Total Revenue: %.2f€%n", totalRevenue);
-                }
-                case 0 -> System.out.println("Returning to main menu...");
-                default -> System.out.println("Invalid option, try again.");
+                case 1 -> sellTicket();
+                case 2 -> showTotalRevenue();
+                case 3 -> listTickets();
+                case 0 -> System.out.println("Returning to Admin Menu...");
+                default -> System.out.println("❌ Invalid option, try again.");
             }
+
+            if (option != 0) InputUtils.pause(scanner);
 
         } while (option != 0);
     }
 
-    private void addNewTicket() {
-        try {
-            System.out.print("Player ID: ");
-            int playerId = Integer.parseInt(scanner.nextLine());
+    private void printMenuOptions() {
+        System.out.println("\n=== 🎟️ SALES MENU ===");
+        System.out.println("1. Sell ticket");
+        System.out.println("2. Show total revenue (€)");
+        System.out.println("3. Show all tickets");
+        System.out.println("0. Return to Admin Menu");
+        System.out.print("Select an option: ");
+    }
 
-            System.out.print("Room ID: ");
-            int roomId = Integer.parseInt(scanner.nextLine());
+    private void sellTicket() {
+        System.out.print("Enter Player ID: ");
+        int playerId = InputUtils.readInt(scanner);
 
-            System.out.print("Purchase date (YYYY-MM-DD): ");
-            LocalDate date = LocalDate.parse(scanner.nextLine());
-            LocalDateTime dateTime = date.atStartOfDay();
+        System.out.print("Enter Room ID: ");
+        int roomId = InputUtils.readInt(scanner);
 
-            System.out.print("Price: ");
-            double price = Double.parseDouble(scanner.nextLine());
+        System.out.print("Enter ticket price (€): ");
+        double price = InputUtils.readDouble(scanner);
 
-            Ticket ticket = new Ticket(0, playerId, roomId, dateTime, price);
-            salesService.addTicket(ticket);
+        boolean success = salesService.sellTicket(playerId, roomId, price);
 
-            System.out.println("Ticket added successfully!");
+        if (success)
+            System.out.println("✅ Ticket sold successfully!");
+        else
+            System.out.println("❌ Error selling ticket.");
+    }
 
-        } catch (Exception e) {
-            System.out.println("Error adding ticket: " + e.getMessage());
-        }
+    private void showTotalRevenue() {
+        double total = salesService.calculateTotalRevenue();
+        System.out.printf("💰 Total revenue: %.2f €%n", total);
+    }
+
+    private void listTickets() {
+        System.out.println("\n=== ALL TICKETS ===");
+        salesService.findAllTickets().forEach(System.out::println);
     }
 }

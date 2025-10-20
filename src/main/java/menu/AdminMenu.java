@@ -44,8 +44,7 @@ public class AdminMenu {
     }
 
     private void printMenuOptions() {
-        System.out.println("\n==============================");
-        System.out.println("⚙️  ADMIN MENU");
+        System.out.println(" ️  ADMIN MENU");
         System.out.println("==============================");
         System.out.println("1. Manage Escape Rooms");
         System.out.println("2. Inventory Management");

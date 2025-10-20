@@ -6,9 +6,10 @@ import model.Player;
 import model.Room;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
- * Genera certificados para los jugadores que completan una sala.
+ * Service class to generate certificates for players who complete a room.
  */
 public class CertificateService {
 
@@ -21,12 +22,16 @@ public class CertificateService {
     }
 
     public String generateCertificate(int playerId, int roomId) {
-        Player player = playerDao.findById(playerId);
-        Room room = roomDao.findById(roomId);
+        Optional<Player> playerOpt = playerDao.findById(playerId);
+        Optional<Room> roomOpt = roomDao.findById(roomId);
 
-        if (player == null || room == null) {
+        // Validaciones de existencia
+        if (playerOpt.isEmpty() || roomOpt.isEmpty()) {
             return "❌ Error: Player or Room not found.";
         }
+
+        Player player = playerOpt.get();
+        Room room = roomOpt.get();
 
         return """
                 🎉 ESCAPE ROOM CERTIFICATE 🎉
