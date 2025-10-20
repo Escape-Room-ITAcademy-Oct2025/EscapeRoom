@@ -8,14 +8,14 @@ public class Room {
 
     private int id;
     private String name;
-    private String difficulty; // podría ser Enum si quieres, pero String es suficiente
+    private Difficulty difficulty; // podría ser Enum si quieres, pero String es suficiente
     private double price;
 
     // ----- Constructors -----
     public Room() {
     }
 
-    public Room(int id, String name, String difficulty, double price) {
+    public Room(int id, String name, Difficulty difficulty, double price) {
         this.id = id;
         this.name = name;
         this.difficulty = difficulty;
@@ -23,7 +23,7 @@ public class Room {
     }
 
     // Constructor sin ID (para inserts)
-    public Room(String name, String difficulty, double price) {
+    public Room(String name, Difficulty difficulty, double price) {
         this.name = name;
         this.difficulty = difficulty;
         this.price = price;
@@ -46,11 +46,11 @@ public class Room {
         this.name = name;
     }
 
-    public String getDifficulty() {
+    public Difficulty getDifficulty() {
         return difficulty;
     }
 
-    public void setDifficulty(String difficulty) {
+    public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
     }
 
