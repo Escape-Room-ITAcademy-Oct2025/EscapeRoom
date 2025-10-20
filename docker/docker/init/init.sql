@@ -2,6 +2,12 @@ DROP DATABASE IF EXISTS escape_room_db;
 CREATE DATABASE escape_room_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE escape_room_db;
 
+-- Escape Room table
+CREATE TABLE escape_room (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
 -- Room table
 CREATE TABLE room (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,6 +63,13 @@ CREATE TABLE reward (
     date_awarded DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (player_id) REFERENCES player(id) ON DELETE SET NULL
 );
+
+-- Add relationship to room
+ALTER TABLE room ADD COLUMN escape_room_id INT;
+ALTER TABLE room
+    ADD FOREIGN KEY (escape_room_id)
+    REFERENCES escape_room(id)
+    ON DELETE CASCADE;
 
 -- Sample rooms
 INSERT INTO room (name, difficulty, price) VALUES
