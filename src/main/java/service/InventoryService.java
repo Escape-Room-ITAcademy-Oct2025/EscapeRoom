@@ -37,9 +37,29 @@ public class InventoryService {
         return roomDao.findById(id);
     }
 
+    public void saveRoom(Room room) {
+        roomDao.save(room);
+    }
+
+    public void removeRoom(Room room) {
+        roomDao.remove(room);
+    }
+
     // ----- Decorations -----
     public List<Decoration> findAllDecorations() {
         return decorationDao.findAll();
+    }
+
+    public Decoration findDecorationById(int id) {
+        return decorationDao.findById(id);
+    }
+
+    public void saveDecoration(Decoration decoration) {
+        decorationDao.save(decoration);
+    }
+
+    public void removeDecoration(Decoration decoration) {
+        decorationDao.remove(decoration);
     }
 
     // ----- Hints -----
@@ -49,6 +69,18 @@ public class InventoryService {
 
     public List<Hint> findHintsByRoom(int roomId) {
         return hintDao.findByRoomId(roomId);
+    }
+
+    public Hint findHintById(int id) {
+        return hintDao.findById(id);
+    }
+
+    public void saveHint(Hint hint) {
+        hintDao.save(hint);
+    }
+
+    public void removeHint(Hint hint) {
+        hintDao.remove(hint);
     }
 
     // ----- Logic -----
