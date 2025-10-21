@@ -2,6 +2,7 @@ package menu;
 
 import service.SalesService;
 import model.Ticket;
+import utils.InputUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,9 +13,9 @@ public class SalesMenu {
     private final SalesService salesService;
     private final Scanner scanner;
 
-    public SalesMenu() {
+    public SalesMenu(Scanner scanner) {
         this.salesService = new SalesService();
-        this.scanner = new Scanner(System.in);
+        this.scanner = scanner;
     }
 
     public void showMenu() {
@@ -28,17 +29,12 @@ public class SalesMenu {
             System.out.println("0. Exit");
             System.out.print("Choose an option: ");
 
-            option = Integer.parseInt(scanner.nextLine());
+            option = InputUtils.readInt(scanner);
 
             switch (option) {
                 case 1 -> salesService.findAllTickets()
-                        .forEach(ticket -> System.out.println(ticket));
-                case 2 -> {
-                    System.out.print("Enter ticket ID: ");
-                    int id = Integer.parseInt(scanner.nextLine());
-                    Ticket ticket = salesService.findTicketById(id);
-                    System.out.println(ticket != null ? ticket : "Ticket not found");
-                }
+                        .forEach(System.out::println);
+                case 2 -> findTicketById();
                 case 3 -> addNewTicket();
                 case 4 -> {
                     double totalRevenue = salesService.calculateTotalRevenue();
@@ -51,20 +47,27 @@ public class SalesMenu {
         } while (option != 0);
     }
 
+    private void findTicketById() {
+        System.out.print("Enter ticket ID: ");
+        int id = InputUtils.readInt(scanner);
+        Ticket ticket = salesService.findTicketById(id);
+        System.out.println(ticket != null ? ticket : "Ticket not found");
+    }
+
     private void addNewTicket() {
         try {
             System.out.print("Player ID: ");
-            int playerId = Integer.parseInt(scanner.nextLine());
+            int playerId = InputUtils.readInt(scanner);
 
             System.out.print("Room ID: ");
-            int roomId = Integer.parseInt(scanner.nextLine());
+            int roomId = InputUtils.readInt(scanner);
 
             System.out.print("Purchase date (YYYY-MM-DD): ");
-            LocalDate date = LocalDate.parse(scanner.nextLine());
+            LocalDate date = LocalDate.parse(InputUtils.readNonEmptyString(scanner));
             LocalDateTime dateTime = date.atStartOfDay();
 
             System.out.print("Price: ");
-            double price = Double.parseDouble(scanner.nextLine());
+            double price = InputUtils.readDouble(scanner);
 
             Ticket ticket = new Ticket(0, playerId, roomId, dateTime, price);
             salesService.addTicket(ticket);

@@ -12,8 +12,8 @@ public class AdminMenu {
     public AdminMenu() {
         this.scanner = new Scanner(System.in);
         this.inventoryMenu = new InventoryMenu(scanner);
-        this.salesMenu = new SalesMenu();
-        this.certificateMenu = new CertificateMenu();
+        this.salesMenu = new SalesMenu(scanner);
+        this.certificateMenu = new CertificateMenu(scanner);
 
     }
 

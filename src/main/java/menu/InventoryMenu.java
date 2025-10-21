@@ -1,10 +1,11 @@
 package menu;
 
-import model.Difficulty;
 import model.Room;
 import model.Hint;
 import model.Decoration;
+import model.Difficulty;
 import service.InventoryService;
+import utils.InputUtils;
 
 import java.util.Scanner;
 
@@ -38,7 +39,7 @@ public class InventoryMenu {
             System.out.println("0. Return to Main Menu");
             System.out.print("Select an option: ");
 
-            option = readInt();
+            option = InputUtils.readInt(scanner);
             switch (option) {
                 case 1 -> addRoom();
                 case 2 -> addHint();
@@ -59,40 +60,38 @@ public class InventoryMenu {
 
     private void addRoom() {
         System.out.print("Enter room name: ");
-        String name = scanner.nextLine();
+        String name = InputUtils.readNonEmptyString(scanner);
 
         System.out.print("Enter difficulty (EASY, MEDIUM, HARD): ");
-        String input = scanner.nextLine().trim().toUpperCase();
-
+        String input = InputUtils.readNonEmptyString(scanner).toUpperCase();
         Difficulty difficulty;
         try {
-            difficulty = Difficulty.valueOf(input); // 👈 aquí conviertes a enum
+            difficulty = Difficulty.valueOf(input);
         } catch (IllegalArgumentException e) {
             System.out.println("⚠️ Invalid difficulty! Defaulting to EASY.");
-            difficulty = Difficulty.EASY; // valor por defecto si el usuario falla
+            difficulty = Difficulty.EASY;
         }
 
         System.out.print("Enter room price (€): ");
-        double price = readDouble();
+        double price = InputUtils.readDouble(scanner);
 
-        Room room = new Room(name, difficulty, price); // ✅ ya inicializado
+        Room room = new Room(name, difficulty, price);
         inventoryService.saveRoom(room);
         System.out.println("✅ Room added successfully: " + room.getName());
     }
 
-
     private void addHint() {
         System.out.print("Enter hint description: ");
-        String description = scanner.nextLine();
+        String description = InputUtils.readNonEmptyString(scanner);
 
         System.out.print("Enter hint theme: ");
-        String theme = scanner.nextLine();
+        String theme = InputUtils.readNonEmptyString(scanner);
 
         System.out.print("Enter related Room ID: ");
-        int roomId = readInt();
+        int roomId = InputUtils.readInt(scanner);
 
         System.out.print("Enter hint price (€): ");
-        double price = readDouble();
+        double price = InputUtils.readDouble(scanner);
 
         Hint hint = new Hint(description, theme, roomId, price);
         inventoryService.saveHint(hint);
@@ -101,16 +100,16 @@ public class InventoryMenu {
 
     private void addDecoration() {
         System.out.print("Enter decoration name: ");
-        String name = scanner.nextLine();
+        String name = InputUtils.readNonEmptyString(scanner);
 
         System.out.print("Enter decoration material: ");
-        String material = scanner.nextLine();
+        String material = InputUtils.readNonEmptyString(scanner);
 
         System.out.print("Enter related Room ID: ");
-        int roomId = readInt();
+        int roomId = InputUtils.readInt(scanner);
 
         System.out.print("Enter decoration price (€): ");
-        double price = readDouble();
+        double price = InputUtils.readDouble(scanner);
 
         Decoration decoration = new Decoration(name, material, price, roomId);
         inventoryService.saveDecoration(decoration);
@@ -139,7 +138,7 @@ public class InventoryMenu {
 
     private void deleteRoom() {
         System.out.print("Enter the Room ID to delete: ");
-        int id = readInt();
+        int id = InputUtils.readInt(scanner);
 
         Room room = inventoryService.findRoomById(id);
         if (room != null) {
@@ -152,7 +151,7 @@ public class InventoryMenu {
 
     private void deleteHint() {
         System.out.print("Enter the Hint ID to delete: ");
-        int id = readInt();
+        int id = InputUtils.readInt(scanner);
 
         Hint hint = inventoryService.findHintById(id);
         if (hint != null) {
@@ -165,7 +164,7 @@ public class InventoryMenu {
 
     private void deleteDecoration() {
         System.out.print("Enter the Decoration ID to delete: ");
-        int id = readInt();
+        int id = InputUtils.readInt(scanner);
 
         Decoration decoration = inventoryService.findDecorationById(id);
         if (decoration != null) {
@@ -173,28 +172,6 @@ public class InventoryMenu {
             System.out.println("🗑️ Decoration deleted successfully.");
         } else {
             System.out.println("❌ Decoration not found.");
-        }
-    }
-
-    // ------------------- INPUT VALIDATION -------------------
-
-    private int readInt() {
-        while (true) {
-            try {
-                return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.print("⚠️ Invalid number, please enter an integer: ");
-            }
-        }
-    }
-
-    private double readDouble() {
-        while (true) {
-            try {
-                return Double.parseDouble(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.print("⚠️ Invalid number, please enter a decimal: ");
-            }
         }
     }
 }
