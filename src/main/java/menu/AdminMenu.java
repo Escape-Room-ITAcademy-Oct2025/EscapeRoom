@@ -18,7 +18,6 @@ public class AdminMenu {
         this.inventoryMenu = new InventoryMenu(scanner);
         this.salesMenu = new SalesMenu(scanner);
         this.certificateMenu = new CertificateMenu(scanner);
-
     }
 
     public void start() {

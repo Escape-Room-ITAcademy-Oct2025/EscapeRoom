@@ -2,7 +2,6 @@ package dao;
 
 import config.DatabaseConfig;
 import model.Room;
-import model.Difficulty;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -48,10 +47,9 @@ public class RoomDaoImpl implements GenericDao<Room> {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Difficulty difficulty = Difficulty.valueOf(rs.getString("difficulty"));
                 Room room = new Room(
                         rs.getString("name"),
-                        difficulty,
+                        Enum.valueOf(model.Difficulty.class, rs.getString("difficulty")),
                         rs.getDouble("price")
                 );
                 room.setId(rs.getInt("id"));
@@ -72,47 +70,12 @@ public class RoomDaoImpl implements GenericDao<Room> {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Difficulty difficulty = Difficulty.valueOf(rs.getString("difficulty"));
-                    return new Room(
-                            rs.getInt("id"),
-                            rs.getString("name"),
-                            difficulty,
-                            rs.getDouble("price")
-                    );
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error finding room by ID: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * Devuelve todas las salas filtradas por dificultad.
-     *
-     * @param difficulty nivel de dificultad (EASY, MEDIUM, HARD)
-     * @return lista de salas que coinciden con esa dificultad
-     */
-    public List<Room> findByDifficulty(Difficulty difficulty) {
-        List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT id, name, difficulty, price FROM room WHERE difficulty = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, difficulty.name());
             ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                Difficulty diff = Difficulty.valueOf(rs.getString("difficulty"));
+            if (rs.next()) {
                 Room room = new Room(
                         rs.getString("name"),
-                        diff,
+                        Enum.valueOf(model.Difficulty.class, rs.getString("difficulty")),
                         rs.getDouble("price")
                 );
                 room.setId(rs.getInt("id"));
