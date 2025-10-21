@@ -10,6 +10,7 @@ public class Room {
     private String name;
     private Difficulty difficulty; // podría ser Enum si quieres, pero String es suficiente
     private double price;
+    private int escapeRoomId;
 
     // ----- Constructors -----
     public Room() {
@@ -62,6 +63,14 @@ public class Room {
         this.price = price;
     }
 
+    public int getEscapeRoomId() {
+        return escapeRoomId;
+    }
+
+    public void setEscapeRoomId(int escapeRoomId) {
+        this.escapeRoomId = escapeRoomId;
+    }
+
     // ----- toString() -----
     @Override
     public String toString() {
@@ -70,6 +79,7 @@ public class Room {
                 ", name='" + name + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", price=" + price +
+                ", escapeRoomId" + escapeRoomId +
                 '}';
     }
 }
