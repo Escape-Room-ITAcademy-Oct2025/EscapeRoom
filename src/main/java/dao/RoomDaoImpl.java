@@ -67,7 +67,7 @@ public class RoomDaoImpl implements GenericDao<Room> {
 
     @Override
     public Optional<Room> findById(int id) {
-        String sql = "SELECT id, name, difficulty, price FROM room WHERE id = ?";
+        String sql = "SELECT id, name, difficulty, price, escape_room_id FROM room WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
