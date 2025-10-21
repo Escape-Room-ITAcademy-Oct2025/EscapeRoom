@@ -1,9 +1,5 @@
 package model;
 
-/**
- * Representa un objeto de decoración dentro de una sala del Escape Room.
- * Cada decoración tiene un nombre, material, precio y pertenece a una sala.
- */
 public class Decoration {
 
     private int id;
@@ -12,7 +8,6 @@ public class Decoration {
     private double price;
     private int roomId;
 
-    // ----- Constructors -----
     public Decoration() {
     }
 
@@ -32,7 +27,6 @@ public class Decoration {
         this.roomId = roomId;
     }
 
-    // ----- Getters & Setters -----
     public int getId() {
         return id;
     }
@@ -73,7 +67,6 @@ public class Decoration {
         this.roomId = roomId;
     }
 
-    // ----- toString() -----
     @Override
     public String toString() {
         return "Decoration{" +

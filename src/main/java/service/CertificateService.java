@@ -8,9 +8,6 @@ import model.Room;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-/**
- * Service class to generate certificates for players who complete a room.
- */
 public class CertificateService {
 
     private final PlayerDaoImpl playerDao;
@@ -25,7 +22,6 @@ public class CertificateService {
         Optional<Player> playerOpt = playerDao.findById(playerId);
         Optional<Room> roomOpt = roomDao.findById(roomId);
 
-        // Validaciones de existencia
         if (playerOpt.isEmpty() || roomOpt.isEmpty()) {
             return "❌ Error: Player or Room not found.";
         }

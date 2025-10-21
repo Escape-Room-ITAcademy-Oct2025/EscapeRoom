@@ -2,9 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 
-/**
- * Representa un ticket de entrada a una sala del Escape Room.
- */
+
 public class Ticket {
 
     private int id;
@@ -13,7 +11,6 @@ public class Ticket {
     private LocalDateTime purchaseDate;
     private double price;
 
-    // ----- Constructors -----
     public Ticket() {
     }
 
@@ -32,7 +29,6 @@ public class Ticket {
         this.purchaseDate = LocalDateTime.now();
     }
 
-    // ----- Getters & Setters -----
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

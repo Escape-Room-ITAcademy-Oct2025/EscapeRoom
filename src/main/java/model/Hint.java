@@ -1,9 +1,5 @@
 package model;
 
-/**
- * Representa una pista (hint) dentro de una sala del Escape Room.
- * Cada pista pertenece a una sala y tiene un tema, descripción y precio.
- */
 public class Hint {
 
     private int id;
@@ -12,7 +8,6 @@ public class Hint {
     private int roomId;
     private double price;
 
-    // ----- Constructors -----
     public Hint() {
     }
 
@@ -24,7 +19,6 @@ public class Hint {
         this.price = price;
     }
 
-    // Constructor sin id (para inserts)
     public Hint(String description, String theme, int roomId, double price) {
         this.description = description;
         this.theme = theme;
@@ -32,7 +26,6 @@ public class Hint {
         this.price = price;
     }
 
-    // ----- Getters & Setters -----
     public int getId() {
         return id;
     }
@@ -73,7 +66,6 @@ public class Hint {
         this.price = price;
     }
 
-    // ----- toString() -----
     @Override
     public String toString() {
         return "Hint{" +

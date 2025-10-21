@@ -1,17 +1,12 @@
 package model;
 
-/**
- * Representa una sala (room) del Escape Room.
- * Cada sala tiene un nombre, una dificultad y un precio base.
- */
 public class Room {
 
     private int id;
     private String name;
-    private Difficulty difficulty; // podría ser Enum si quieres, pero String es suficiente
+    private Difficulty difficulty;
     private double price;
 
-    // ----- Constructors -----
     public Room() {
     }
 
@@ -22,14 +17,12 @@ public class Room {
         this.price = price;
     }
 
-    // Constructor sin ID (para inserts)
     public Room(String name, Difficulty difficulty, double price) {
         this.name = name;
         this.difficulty = difficulty;
         this.price = price;
     }
 
-    // ----- Getters & Setters -----
     public int getId() {
         return id;
     }
@@ -62,7 +55,6 @@ public class Room {
         this.price = price;
     }
 
-    // ----- toString() -----
     @Override
     public String toString() {
         return "Room{" +

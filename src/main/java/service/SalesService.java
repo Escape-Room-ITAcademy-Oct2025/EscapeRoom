@@ -7,9 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Handles all business logic related to ticket sales and revenue tracking.
- */
+
 public class SalesService {
 
     private final TicketDaoImpl ticketDao;
@@ -18,12 +16,9 @@ public class SalesService {
         this.ticketDao = new TicketDaoImpl();
     }
 
-    // ────────────────────────────────
-    // 🎟️ CREATE
-    // ────────────────────────────────
     public boolean sellTicket(int playerId, int roomId, double price) {
         if (price <= 0) {
-            System.out.println("⚠️ Invalid ticket price. Must be greater than 0.");
+            System.out.println("Invalid ticket price. Must be greater than 0.");
             return false;
         }
 
@@ -44,9 +39,6 @@ public class SalesService {
         return success;
     }
 
-    // ────────────────────────────────
-    // 📊 READ
-    // ────────────────────────────────
     public List<Ticket> findAllTickets() {
         return ticketDao.findAll();
     }
@@ -55,9 +47,6 @@ public class SalesService {
         return ticketDao.findById(id);
     }
 
-    // ────────────────────────────────
-    // 💰 AGGREGATION
-    // ────────────────────────────────
     public double calculateTotalRevenue() {
         return ticketDao.findAll()
                 .stream()
@@ -65,9 +54,6 @@ public class SalesService {
                 .sum();
     }
 
-    // ────────────────────────────────
-    // 🗑️ DELETE
-    // ────────────────────────────────
     public boolean deleteTicketById(int id) {
         Optional<Ticket> ticketOpt = ticketDao.findById(id);
         return ticketOpt.map(ticketDao::remove).orElse(false);
