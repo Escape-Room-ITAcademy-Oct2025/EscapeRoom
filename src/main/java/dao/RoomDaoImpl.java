@@ -2,6 +2,7 @@ package dao;
 
 import config.DatabaseConfig;
 import model.Room;
+import model.Difficulty;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class RoomDaoImpl implements GenericDao<Room> {
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, room.getName());
-            stmt.setString(2, room.getDifficulty());
+            stmt.setString(2, room.getDifficulty().name());
             stmt.setDouble(3, room.getPrice());
             stmt.executeUpdate();
 
@@ -51,10 +52,11 @@ public class RoomDaoImpl implements GenericDao<Room> {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                Difficulty difficulty = Difficulty.valueOf(rs.getString("difficulty"));
                 Room room = new Room(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("difficulty"),
+                        difficulty,
                         rs.getDouble("price")
                 );
                 rooms.add(room);
@@ -78,10 +80,11 @@ public class RoomDaoImpl implements GenericDao<Room> {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    Difficulty difficulty = Difficulty.valueOf(rs.getString("difficulty"));
                     return new Room(
                             rs.getInt("id"),
                             rs.getString("name"),
-                            rs.getString("difficulty"),
+                            difficulty,
                             rs.getDouble("price")
                     );
                 }
@@ -98,24 +101,25 @@ public class RoomDaoImpl implements GenericDao<Room> {
     /**
      * Devuelve todas las salas filtradas por dificultad.
      *
-     * @param difficulty nivel de dificultad (Easy, Medium, Hard)
+     * @param difficulty nivel de dificultad (EASY, MEDIUM, HARD)
      * @return lista de salas que coinciden con esa dificultad
      */
-    public List<Room> findByDifficulty(String difficulty) {
+    public List<Room> findByDifficulty(Difficulty difficulty) {
         List<Room> rooms = new ArrayList<>();
         String sql = "SELECT id, name, difficulty, price FROM room WHERE difficulty = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, difficulty);
+            stmt.setString(1, difficulty.name());
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                Difficulty diff = Difficulty.valueOf(rs.getString("difficulty"));
                 Room room = new Room(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("difficulty"),
+                        diff,
                         rs.getDouble("price")
                 );
                 rooms.add(room);

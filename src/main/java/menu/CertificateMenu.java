@@ -1,6 +1,8 @@
 package menu;
 
 import service.CertificateService;
+import utils.InputUtils;
+
 import java.util.Scanner;
 
 public class CertificateMenu {
@@ -8,9 +10,9 @@ public class CertificateMenu {
     private final CertificateService certificateService;
     private final Scanner scanner;
 
-    public CertificateMenu() {
+    public CertificateMenu(Scanner scanner) {
         this.certificateService = new CertificateService();
-        this.scanner = new Scanner(System.in);
+        this.scanner = scanner;
     }
 
     public void showMenu() {
@@ -21,7 +23,7 @@ public class CertificateMenu {
             System.out.println("0. Exit");
             System.out.print("Choose an option: ");
 
-            option = Integer.parseInt(scanner.nextLine());
+            option = InputUtils.readInt(scanner);
 
             switch (option) {
                 case 1 -> generateCertificate();
@@ -35,10 +37,10 @@ public class CertificateMenu {
     private void generateCertificate() {
         try {
             System.out.print("Enter Player ID: ");
-            int playerId = Integer.parseInt(scanner.nextLine());
+            int playerId = InputUtils.readInt(scanner);
 
             System.out.print("Enter Room ID: ");
-            int roomId = Integer.parseInt(scanner.nextLine());
+            int roomId = InputUtils.readInt(scanner);
 
             String certificate = certificateService.generateCertificate(playerId, roomId);
             System.out.println("\n" + certificate);
