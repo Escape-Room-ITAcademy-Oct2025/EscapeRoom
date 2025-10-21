@@ -2,6 +2,7 @@ package dao;
 
 import config.DatabaseConfig;
 import model.EscapeRoom;
+import model.Room;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class EscapeRoomDaoImpl implements GenericDao<EscapeRoom> {
     @Override
     public List<EscapeRoom> findAll() {
         List<EscapeRoom> escapeRooms = new ArrayList<>();
+        RoomDaoImpl roomDao = new RoomDaoImpl();
         String sql = "SELECT id, name FROM escape_room";
 
         try (Connection conn = getConnection();
@@ -47,6 +49,8 @@ public class EscapeRoomDaoImpl implements GenericDao<EscapeRoom> {
             while (rs.next()) {
                 EscapeRoom er = new EscapeRoom(rs.getString("name"));
                 er.setId(rs.getInt("id"));
+                List<Room> rooms = roomDao.findByEscapeRoomId(er.getId());
+                rooms.forEach(er::addRoom);
                 escapeRooms.add(er);
             }
 
