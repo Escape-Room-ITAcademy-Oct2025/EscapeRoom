@@ -1,10 +1,12 @@
 package dao;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GenericDao<T> {
-    void save(T t);
+
+    boolean save(T t);
     List<T> findAll();
-    T findById(int id);
-    void remove(T t);
+    Optional<T> findById(int id);
+    boolean remove(T t);
 }

@@ -6,6 +6,7 @@ import model.EscapeRoom;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class EscapeRoomDaoImpl implements GenericDao<EscapeRoom> {
 
@@ -14,27 +15,30 @@ public class EscapeRoomDaoImpl implements GenericDao<EscapeRoom> {
     }
 
     @Override
-    public void save(EscapeRoom escapeRoom) {
+    public boolean save(EscapeRoom escapeRoom) {
         String sql = "INSERT INTO escape_room (name) VALUES (?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, escapeRoom.getName());
-            stmt.executeUpdate();
+            int rows = stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) escapeRoom.setId(rs.getInt(1));
             }
 
+            return rows > 0;
+
         } catch (SQLException e) {
             System.err.println("Error saving EscapeRoom: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
     public List<EscapeRoom> findAll() {
         List<EscapeRoom> escapeRooms = new ArrayList<>();
-        String sql = "SELECT * FROM escape_room";
+        String sql = "SELECT id, name FROM escape_room";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -54,8 +58,8 @@ public class EscapeRoomDaoImpl implements GenericDao<EscapeRoom> {
     }
 
     @Override
-    public EscapeRoom findById(int id) {
-        String sql = "SELECT * FROM escape_room WHERE id = ?";
+    public Optional<EscapeRoom> findById(int id) {
+        String sql = "SELECT id, name FROM escape_room WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -65,27 +69,28 @@ public class EscapeRoomDaoImpl implements GenericDao<EscapeRoom> {
             if (rs.next()) {
                 EscapeRoom er = new EscapeRoom(rs.getString("name"));
                 er.setId(rs.getInt("id"));
-                return er;
+                return Optional.of(er);
             }
 
         } catch (SQLException e) {
             System.err.println("Error finding EscapeRoom by ID: " + e.getMessage());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public void remove(EscapeRoom escapeRoom) {
+    public boolean remove(EscapeRoom escapeRoom) {
         String sql = "DELETE FROM escape_room WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, escapeRoom.getId());
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.err.println("Error deleting EscapeRoom: " + e.getMessage());
+            return false;
         }
     }
 }

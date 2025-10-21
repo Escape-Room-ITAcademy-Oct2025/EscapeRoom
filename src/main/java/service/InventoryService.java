@@ -8,96 +8,94 @@ import model.Hint;
 import model.Room;
 
 import java.util.List;
+import java.util.Optional;
 
-/**
- * InventoryService centraliza la gestión de todos los elementos físicos o jugables
- * del Escape Room: salas, decoraciones y pistas.
- *
- * Combina la información de varios DAOs y proporciona lógica de negocio
- * como cálculos de valor total, filtrado o disponibilidad.
- */
 public class InventoryService {
 
     private final RoomDaoImpl roomDao;
-    private final DecorationDaoImpl decorationDao;
     private final HintDaoImpl hintDao;
+    private final DecorationDaoImpl decorationDao;
 
     public InventoryService() {
         this.roomDao = new RoomDaoImpl();
-        this.decorationDao = new DecorationDaoImpl();
         this.hintDao = new HintDaoImpl();
+        this.decorationDao = new DecorationDaoImpl();
     }
 
-    // ----- Rooms -----
+    // ─────────── ROOMS ───────────
+    public boolean saveRoom(Room room) {
+        return roomDao.save(room);
+    }
+
     public List<Room> findAllRooms() {
         return roomDao.findAll();
     }
 
     public Room findRoomById(int id) {
-        return roomDao.findById(id);
+        Optional<Room> roomOpt = roomDao.findById(id);
+        return roomOpt.orElse(null);
     }
 
-    public void saveRoom(Room room) {
-        roomDao.save(room);
+    public boolean removeRoom(Room room) {
+        return roomDao.remove(room);
     }
 
-    public void removeRoom(Room room) {
-        roomDao.remove(room);
+    public boolean removeRoomById(int id) {
+        Optional<Room> roomOpt = roomDao.findById(id);
+        return roomOpt.map(roomDao::remove).orElse(false);
     }
 
-    // ----- Decorations -----
+    // ─────────── HINTS ───────────
+    public boolean saveHint(Hint hint) {
+        return hintDao.save(hint);
+    }
+
+    public List<Hint> findAllHints() {
+        return hintDao.findAll();
+    }
+
+    public Hint findHintById(int id) {
+        Optional<Hint> hintOpt = hintDao.findById(id);
+        return hintOpt.orElse(null);
+    }
+
+    public boolean removeHint(Hint hint) {
+        return hintDao.remove(hint);
+    }
+
+    public boolean removeHintById(int id) {
+        Optional<Hint> hintOpt = hintDao.findById(id);
+        return hintOpt.map(hintDao::remove).orElse(false);
+    }
+
+    // ─────────── DECORATIONS ───────────
+    public boolean saveDecoration(Decoration decoration) {
+        return decorationDao.save(decoration);
+    }
+
     public List<Decoration> findAllDecorations() {
         return decorationDao.findAll();
     }
 
     public Decoration findDecorationById(int id) {
-        return decorationDao.findById(id);
+        Optional<Decoration> decOpt = decorationDao.findById(id);
+        return decOpt.orElse(null);
     }
 
-    public void saveDecoration(Decoration decoration) {
-        decorationDao.save(decoration);
+    public boolean removeDecoration(Decoration decoration) {
+        return decorationDao.remove(decoration);
     }
 
-    public void removeDecoration(Decoration decoration) {
-        decorationDao.remove(decoration);
+    public boolean removeDecorationById(int id) {
+        Optional<Decoration> decOpt = decorationDao.findById(id);
+        return decOpt.map(decorationDao::remove).orElse(false);
     }
 
-    // ----- Hints -----
-    public List<Hint> findAllHints() {
-        return hintDao.findAll();
-    }
-
-    public List<Hint> findHintsByRoom(int roomId) {
-        return hintDao.findByRoomId(roomId);
-    }
-
-    public Hint findHintById(int id) {
-        return hintDao.findById(id);
-    }
-
-    public void saveHint(Hint hint) {
-        hintDao.save(hint);
-    }
-
-    public void removeHint(Hint hint) {
-        hintDao.remove(hint);
-    }
-
-    // ----- Logic -----
-    /**
-     * Calcula el valor total del inventario sumando el precio
-     * de todas las decoraciones y las salas disponibles.
-     */
+    // ─────────── TOTAL VALUE ───────────
     public double calculateTotalInventoryValue() {
-        double decorationsValue = findAllDecorations().stream()
-                .mapToDouble(Decoration::getPrice)
-                .sum();
-
-        // Asegúrate de que en Room tienes getPrice(), no getValue()
-        double roomsValue = findAllRooms().stream()
-                .mapToDouble(Room::getPrice)
-                .sum();
-
-        return decorationsValue + roomsValue;
+        double totalRooms = roomDao.findAll().stream().mapToDouble(Room::getPrice).sum();
+        double totalHints = hintDao.findAll().stream().mapToDouble(Hint::getPrice).sum();
+        double totalDecorations = decorationDao.findAll().stream().mapToDouble(Decoration::getPrice).sum();
+        return totalRooms + totalHints + totalDecorations;
     }
 }

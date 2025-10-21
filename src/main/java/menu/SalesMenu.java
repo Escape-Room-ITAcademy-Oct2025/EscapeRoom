@@ -4,8 +4,6 @@ import service.SalesService;
 import model.Ticket;
 import utils.InputUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class SalesMenu {
@@ -18,16 +16,8 @@ public class SalesMenu {
         this.scanner = scanner;
     }
 
-    public void showMenu() {
+    public void start() {
         int option;
-        do {
-            System.out.println("\n--- Sales Menu ---");
-            System.out.println("1. Show all tickets");
-            System.out.println("2. Find ticket by ID");
-            System.out.println("3. Add new ticket");
-            System.out.println("4. Calculate total revenue");
-            System.out.println("0. Exit");
-            System.out.print("Choose an option: ");
 
             option = InputUtils.readInt(scanner);
 
@@ -43,6 +33,8 @@ public class SalesMenu {
                 case 0 -> System.out.println("Returning to main menu...");
                 default -> System.out.println("Invalid option, try again.");
             }
+
+            if (option != 0) InputUtils.pause(scanner);
 
         } while (option != 0);
     }
@@ -69,13 +61,21 @@ public class SalesMenu {
             System.out.print("Price: ");
             double price = InputUtils.readDouble(scanner);
 
-            Ticket ticket = new Ticket(0, playerId, roomId, dateTime, price);
-            salesService.addTicket(ticket);
+        boolean success = salesService.sellTicket(playerId, roomId, price);
 
-            System.out.println("Ticket added successfully!");
+        if (success)
+            System.out.println("✅ Ticket sold successfully!");
+        else
+            System.out.println("❌ Error selling ticket.");
+    }
 
-        } catch (Exception e) {
-            System.out.println("Error adding ticket: " + e.getMessage());
-        }
+    private void showTotalRevenue() {
+        double total = salesService.calculateTotalRevenue();
+        System.out.printf("💰 Total revenue: %.2f €%n", total);
+    }
+
+    private void listTickets() {
+        System.out.println("\n=== ALL TICKETS ===");
+        salesService.findAllTickets().forEach(System.out::println);
     }
 }

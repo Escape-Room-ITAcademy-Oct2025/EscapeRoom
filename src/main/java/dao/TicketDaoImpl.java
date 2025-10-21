@@ -4,9 +4,9 @@ import config.DatabaseConfig;
 import model.Ticket;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TicketDaoImpl implements GenericDao<Ticket> {
 
@@ -15,7 +15,7 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
     }
 
     @Override
-    public void save(Ticket ticket) {
+    public boolean save(Ticket ticket) {
         String sql = "INSERT INTO ticket (player_id, room_id, price, purchase_date) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
@@ -25,23 +25,25 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
             stmt.setInt(2, ticket.getRoomId());
             stmt.setDouble(3, ticket.getPrice());
             stmt.setTimestamp(4, Timestamp.valueOf(ticket.getPurchaseDate()));
-            stmt.executeUpdate();
+
+            int rows = stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    ticket.setId(rs.getInt(1));
-                }
+                if (rs.next()) ticket.setId(rs.getInt(1));
             }
 
+            return rows > 0;
+
         } catch (SQLException e) {
-            System.err.println("Error inserting ticket: " + e.getMessage());
+            System.err.println("Error saving Ticket: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
     public List<Ticket> findAll() {
         List<Ticket> tickets = new ArrayList<>();
-        String sql = "SELECT * FROM ticket";
+        String sql = "SELECT id, player_id, room_id, price, purchase_date FROM ticket";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -59,51 +61,53 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error fetching tickets: " + e.getMessage());
+            System.err.println("Error fetching Tickets: " + e.getMessage());
         }
 
         return tickets;
     }
 
     @Override
-    public Ticket findById(int id) {
-        String sql = "SELECT * FROM ticket WHERE id = ?";
+    public Optional<Ticket> findById(int id) {
+        String sql = "SELECT id, player_id, room_id, price, purchase_date FROM ticket WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Ticket(
-                            rs.getInt("id"),
-                            rs.getInt("player_id"),
-                            rs.getInt("room_id"),
-                            rs.getTimestamp("purchase_date").toLocalDateTime(),
-                            rs.getDouble("price")
-                    );
-                }
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Ticket ticket = new Ticket(
+                        rs.getInt("id"),
+                        rs.getInt("player_id"),
+                        rs.getInt("room_id"),
+                        rs.getTimestamp("purchase_date").toLocalDateTime(),
+                        rs.getDouble("price")
+                );
+                return Optional.of(ticket);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error finding ticket: " + e.getMessage());
+            System.err.println("Error finding Ticket by ID: " + e.getMessage());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public void remove(Ticket ticket) {
+    public boolean remove(Ticket ticket) {
         String sql = "DELETE FROM ticket WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, ticket.getId());
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error deleting ticket: " + e.getMessage());
+            System.err.println("Error deleting Ticket: " + e.getMessage());
+            return false;
         }
     }
 }

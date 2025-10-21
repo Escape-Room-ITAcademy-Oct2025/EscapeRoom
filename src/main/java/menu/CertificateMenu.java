@@ -15,7 +15,7 @@ public class CertificateMenu {
         this.scanner = scanner;
     }
 
-    public void showMenu() {
+    public void start() {
         int option;
         do {
             System.out.println("\n--- Certificate Menu ---");
@@ -27,11 +27,20 @@ public class CertificateMenu {
 
             switch (option) {
                 case 1 -> generateCertificate();
-                case 0 -> System.out.println("Returning to main menu...");
-                default -> System.out.println("Invalid option, try again.");
+                case 0 -> System.out.println("Returning to Admin Menu...");
+                default -> System.out.println("❌ Invalid option, please try again.");
             }
 
+            if (option != 0) InputUtils.pause(scanner);
+
         } while (option != 0);
+    }
+
+    private void printMenuOptions() {
+        System.out.println("\n=== 🏅 CERTIFICATE MENU ===");
+        System.out.println("1. Generate certificate");
+        System.out.println("0. Return to Admin Menu");
+        System.out.print("Select an option: ");
     }
 
     private void generateCertificate() {
@@ -42,11 +51,9 @@ public class CertificateMenu {
             System.out.print("Enter Room ID: ");
             int roomId = InputUtils.readInt(scanner);
 
-            String certificate = certificateService.generateCertificate(playerId, roomId);
-            System.out.println("\n" + certificate);
+        String certificate = certificateService.generateCertificate(playerId, roomId);
 
-        } catch (Exception e) {
-            System.out.println("Error generating certificate: " + e.getMessage());
-        }
+        System.out.println();
+        System.out.println(certificate);
     }
 }
