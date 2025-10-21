@@ -64,7 +64,6 @@ public class Room {
         this.escapeRoomId = escapeRoomId;
     }
 
-    // ----- toString() -----
     @Override
     public String toString() {
         return "Room{" +
