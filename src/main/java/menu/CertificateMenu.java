@@ -18,7 +18,11 @@ public class CertificateMenu {
     public void start() {
         int option;
         do {
-            printMenuOptions();
+            System.out.println("\n--- Certificate Menu ---");
+            System.out.println("1. Generate certificate");
+            System.out.println("0. Exit");
+            System.out.print("Choose an option: ");
+
             option = InputUtils.readInt(scanner);
 
             switch (option) {
@@ -40,11 +44,12 @@ public class CertificateMenu {
     }
 
     private void generateCertificate() {
-        System.out.print("Enter Player ID: ");
-        int playerId = InputUtils.readInt(scanner);
+        try {
+            System.out.print("Enter Player ID: ");
+            int playerId = InputUtils.readInt(scanner);
 
-        System.out.print("Enter Room ID: ");
-        int roomId = InputUtils.readInt(scanner);
+            System.out.print("Enter Room ID: ");
+            int roomId = InputUtils.readInt(scanner);
 
         String certificate = certificateService.generateCertificate(playerId, roomId);
 
