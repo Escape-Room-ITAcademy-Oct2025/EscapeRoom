@@ -1,9 +1,11 @@
 package menu;
 
 import model.*;
+import service.EscapeRoomService;
 import service.InventoryService;
 import utils.InputUtils;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class InventoryMenu {
@@ -61,6 +63,23 @@ public class InventoryMenu {
     // ➕ CREATE
     // ────────────────────────────────
     private void addRoom() {
+        System.out.println("\n=== Available Escape Rooms ===");
+        EscapeRoomService escapeRoomService = new EscapeRoomService();
+        escapeRoomService.findAllEscapeRooms().forEach(System.out::println);
+
+        System.out.print("Enter EscapeRoom ID to assign this room to: ");
+        int escapeRoomId = InputUtils.readInt(scanner);
+
+        Optional<EscapeRoom> er = escapeRoomService.findAllEscapeRooms()
+                .stream()
+                .filter(e -> e.getId() == escapeRoomId)
+                .findFirst();
+
+        if (er.isEmpty()) {
+            System.out.println("❌ EscapeRoom ID not found. Operation cancelled.");
+            return;
+        }
+
         System.out.print("Enter room name: ");
         String name = scanner.nextLine().trim();
 
@@ -77,8 +96,10 @@ public class InventoryMenu {
         double price = InputUtils.readDouble(scanner);
 
         Room room = new Room(name, difficulty, price);
+        room.setEscapeRoomId(escapeRoomId);
+
         inventoryService.saveRoom(room);
-        System.out.println("✅ Room added successfully: " + room.getName());
+        System.out.println("✅ Room added successfully: " + room.getName() + " (EscapeRoom ID: " + escapeRoomId + ")");
     }
 
     private void addHint() {
