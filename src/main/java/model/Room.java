@@ -6,6 +6,7 @@ public class Room {
     private String name;
     private Difficulty difficulty;
     private double price;
+    private int escapeRoomId;
 
     public Room() {
     }
@@ -55,6 +56,15 @@ public class Room {
         this.price = price;
     }
 
+    public int getEscapeRoomId() {
+        return escapeRoomId;
+    }
+
+    public void setEscapeRoomId(int escapeRoomId) {
+        this.escapeRoomId = escapeRoomId;
+    }
+
+    // ----- toString() -----
     @Override
     public String toString() {
         return "Room{" +
@@ -62,6 +72,7 @@ public class Room {
                 ", name='" + name + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", price=" + price +
+                ", escapeRoomId" + escapeRoomId +
                 '}';
     }
 }
