@@ -7,10 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * Configuración de conexión a la base de datos.
- * Carga las credenciales desde db.properties y permite obtener una conexión JDBC.
- */
+
 public class DatabaseConfig {
 
     private static DatabaseConfig instance;

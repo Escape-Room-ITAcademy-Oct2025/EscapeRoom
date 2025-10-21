@@ -50,7 +50,7 @@ public class EscapeRoomMenu {
         String name = scanner.nextLine().trim();
 
         if (name.isEmpty()) {
-            System.out.println("⚠️ Name cannot be empty.");
+            System.out.println("Name cannot be empty.");
             return;
         }
 
@@ -68,7 +68,7 @@ public class EscapeRoomMenu {
         var escapeRooms = escapeRoomService.findAllEscapeRooms();
 
         if (escapeRooms.isEmpty()) {
-            System.out.println("⚠️ No Escape Rooms found.");
+            System.out.println("No Escape Rooms found.");
             return;
         }
 
@@ -90,7 +90,7 @@ public class EscapeRoomMenu {
             else
                 System.out.println("❌ Error deleting Escape Room. Try again.");
         } else {
-            System.out.println("⚠️ No Escape Room found with ID " + id);
+            System.out.println("No Escape Room found with ID " + id);
         }
     }
 }

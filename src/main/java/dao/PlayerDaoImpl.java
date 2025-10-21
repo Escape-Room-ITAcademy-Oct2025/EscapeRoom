@@ -14,9 +14,6 @@ public class PlayerDaoImpl implements GenericDao<Player> {
         return DatabaseConfig.getInstance().getConnection();
     }
 
-    // ────────────────────────────────
-    // CREATE
-    // ────────────────────────────────
     @Override
     public boolean save(Player player) {
         String sql = "INSERT INTO player (name, email) VALUES (?, ?)";
@@ -42,9 +39,6 @@ public class PlayerDaoImpl implements GenericDao<Player> {
         }
     }
 
-    // ────────────────────────────────
-    // READ ALL
-    // ────────────────────────────────
     @Override
     public List<Player> findAll() {
         List<Player> players = new ArrayList<>();
@@ -70,9 +64,6 @@ public class PlayerDaoImpl implements GenericDao<Player> {
         return players;
     }
 
-    // ────────────────────────────────
-    // READ BY ID
-    // ────────────────────────────────
     @Override
     public Optional<Player> findById(int id) {
         String sql = "SELECT id, name, email FROM player WHERE id = ?";
@@ -99,9 +90,7 @@ public class PlayerDaoImpl implements GenericDao<Player> {
         return Optional.empty();
     }
 
-    // ────────────────────────────────
-    // DELETE
-    // ────────────────────────────────
+
     @Override
     public boolean remove(Player player) {
         String sql = "DELETE FROM player WHERE id = ?";

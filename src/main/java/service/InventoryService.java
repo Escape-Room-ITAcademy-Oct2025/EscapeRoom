@@ -22,7 +22,6 @@ public class InventoryService {
         this.decorationDao = new DecorationDaoImpl();
     }
 
-    // ─────────── ROOMS ───────────
     public boolean saveRoom(Room room) {
         return roomDao.save(room);
     }
@@ -45,7 +44,6 @@ public class InventoryService {
         return roomOpt.map(roomDao::remove).orElse(false);
     }
 
-    // ─────────── HINTS ───────────
     public boolean saveHint(Hint hint) {
         return hintDao.save(hint);
     }
@@ -68,7 +66,6 @@ public class InventoryService {
         return hintOpt.map(hintDao::remove).orElse(false);
     }
 
-    // ─────────── DECORATIONS ───────────
     public boolean saveDecoration(Decoration decoration) {
         return decorationDao.save(decoration);
     }
@@ -91,7 +88,6 @@ public class InventoryService {
         return decOpt.map(decorationDao::remove).orElse(false);
     }
 
-    // ─────────── TOTAL VALUE ───────────
     public double calculateTotalInventoryValue() {
         double totalRooms = roomDao.findAll().stream().mapToDouble(Room::getPrice).sum();
         double totalHints = hintDao.findAll().stream().mapToDouble(Hint::getPrice).sum();

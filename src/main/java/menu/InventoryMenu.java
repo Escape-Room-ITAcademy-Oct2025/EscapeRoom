@@ -40,9 +40,6 @@ public class InventoryMenu {
         } while (option != 0);
     }
 
-    // ────────────────────────────────
-    // 📋 MENU PRINT
-    // ────────────────────────────────
     private void printMenu() {
         System.out.println("\n=== 🧱 INVENTORY MENU ===");
         System.out.println("1. ➕ Add new Room");
@@ -57,9 +54,6 @@ public class InventoryMenu {
         System.out.print("Select an option: ");
     }
 
-    // ────────────────────────────────
-    // ➕ CREATE
-    // ────────────────────────────────
     private void addRoom() {
         System.out.print("Enter room name: ");
         String name = scanner.nextLine().trim();
@@ -69,7 +63,7 @@ public class InventoryMenu {
         try {
             difficulty = Difficulty.valueOf(scanner.nextLine().trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            System.out.println("⚠️ Invalid difficulty! Defaulting to EASY.");
+            System.out.println("Invalid difficulty! Defaulting to EASY.");
             difficulty = Difficulty.EASY;
         }
 
@@ -117,9 +111,6 @@ public class InventoryMenu {
         System.out.println("✅ Decoration added successfully.");
     }
 
-    // ────────────────────────────────
-    // 📊 READ
-    // ────────────────────────────────
     private void showInventory() {
         System.out.println("\n=== 🧩 ROOMS ===");
         inventoryService.findAllRooms().forEach(System.out::println);
@@ -136,9 +127,6 @@ public class InventoryMenu {
         System.out.printf("💰 Total Inventory Value: %.2f €%n", total);
     }
 
-    // ────────────────────────────────
-    // ❌ DELETE
-    // ────────────────────────────────
     private void deleteEntity(String type) {
         System.out.printf("Enter the %s ID to delete: ", type);
         int id = InputUtils.readInt(scanner);

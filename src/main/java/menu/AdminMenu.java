@@ -32,7 +32,7 @@ public class AdminMenu {
                 case 2 -> inventoryMenu.start();
                 case 3 -> salesMenu.start();
                 case 4 -> certificateMenu.start();
-                case 0 -> System.out.println("👋 Exiting program... Goodbye!");
+                case 0 -> System.out.println(" Exiting program... Goodbye!");
                 default -> System.out.println("❌ Invalid option, try again.");
             }
 

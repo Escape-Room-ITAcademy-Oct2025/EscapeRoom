@@ -10,7 +10,7 @@ public class SalesMenu {
     private final SalesService salesService;
     private final Scanner scanner;
 
-    public SalesMenu(Scanner scanner) { // ✅ ahora acepta el Scanner
+    public SalesMenu(Scanner scanner) {
         this.salesService = new SalesService();
         this.scanner = scanner;
     }

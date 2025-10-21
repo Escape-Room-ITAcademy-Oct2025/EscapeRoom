@@ -1,15 +1,11 @@
 package model;
 
-/**
- * Representa un jugador del Escape Room.
- */
 public class Player {
 
     private int id;
     private String name;
     private String email;
 
-    // ----- Constructors -----
     public Player() {
     }
 
@@ -24,7 +20,6 @@ public class Player {
         this.email = email;
     }
 
-    // ----- Getters & Setters -----
     public int getId() {
         return id;
     }

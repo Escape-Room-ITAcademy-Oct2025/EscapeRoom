@@ -2,9 +2,6 @@ package model;
 
 import java.time.LocalDateTime;
 
-/**
- * Representa una recompensa ganada por un jugador.
- */
 public class Reward {
 
     private int id;
@@ -31,7 +28,6 @@ public class Reward {
         this.dateAwarded = LocalDateTime.now();
     }
 
-    // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
