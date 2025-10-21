@@ -9,11 +9,6 @@ import utils.InputUtils;
 
 import java.util.Scanner;
 
-/**
- * InventoryMenu allows the admin to manage the Escape Room inventory.
- * It includes CRUD operations for Rooms, Hints, and Decorations,
- * and displays the total value of the current inventory.
- */
 public class InventoryMenu {
 
     private final InventoryService inventoryService;
@@ -46,18 +41,38 @@ public class InventoryMenu {
                 case 3 -> addDecoration();
                 case 4 -> showInventory();
                 case 5 -> showTotalValue();
-                case 6 -> deleteRoom();
-                case 7 -> deleteHint();
-                case 8 -> deleteDecoration();
-                case 0 -> System.out.println("Returning to main menu...");
-                default -> System.out.println("❌ Invalid option. Please try again.");
+                case 6 -> deleteEntity("Room");
+                case 7 -> deleteEntity("Hint");
+                case 8 -> deleteEntity("Decoration");
+                case 0 -> System.out.println("Returning to Admin Menu...");
+                default -> System.out.println("❌ Invalid option. Try again.");
             }
+
+            if (option != 0) InputUtils.pause(scanner);
 
         } while (option != 0);
     }
 
-    // ------------------- CREATE -------------------
+    // ────────────────────────────────
+    // 📋 MENU PRINT
+    // ────────────────────────────────
+    private void printMenu() {
+        System.out.println("\n=== 🧱 INVENTORY MENU ===");
+        System.out.println("1. ➕ Add new Room");
+        System.out.println("2. ➕ Add new Hint");
+        System.out.println("3. ➕ Add new Decoration");
+        System.out.println("4. 📋 Show full Inventory");
+        System.out.println("5. 💰 Show total Inventory value");
+        System.out.println("6. 🗑️ Delete Room");
+        System.out.println("7. 🗑️ Delete Hint");
+        System.out.println("8. 🗑️ Delete Decoration");
+        System.out.println("0. ⬅️ Return to Admin Menu");
+        System.out.print("Select an option: ");
+    }
 
+    // ────────────────────────────────
+    // ➕ CREATE
+    // ────────────────────────────────
     private void addRoom() {
         System.out.print("Enter room name: ");
         String name = InputUtils.readNonEmptyString(scanner);
@@ -116,10 +131,11 @@ public class InventoryMenu {
         System.out.println("✅ Decoration added successfully.");
     }
 
-    // ------------------- READ -------------------
-
+    // ────────────────────────────────
+    // 📊 READ
+    // ────────────────────────────────
     private void showInventory() {
-        System.out.println("\n=== 🧱 ROOMS ===");
+        System.out.println("\n=== 🧩 ROOMS ===");
         inventoryService.findAllRooms().forEach(System.out::println);
 
         System.out.println("\n=== 💡 HINTS ===");

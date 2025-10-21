@@ -6,10 +6,8 @@ import model.Reward;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Implementación del DAO para la entidad Reward.
- */
 public class RewardDaoImpl implements GenericDao<Reward> {
 
     private Connection getConnection() throws SQLException {
@@ -17,7 +15,7 @@ public class RewardDaoImpl implements GenericDao<Reward> {
     }
 
     @Override
-    public void save(Reward reward) {
+    public boolean save(Reward reward) {
         String sql = "INSERT INTO reward (player_id, name, description) VALUES (?, ?, ?)";
 
         try (Connection conn = getConnection();
@@ -26,24 +24,24 @@ public class RewardDaoImpl implements GenericDao<Reward> {
             stmt.setInt(1, reward.getPlayerId());
             stmt.setString(2, reward.getName());
             stmt.setString(3, reward.getDescription());
-            stmt.executeUpdate();
+            int rows = stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    reward.setId(rs.getInt(1));
-                }
+                if (rs.next()) reward.setId(rs.getInt(1));
             }
 
+            return rows > 0;
+
         } catch (SQLException e) {
-            System.err.println("Error inserting reward: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error saving reward: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
     public List<Reward> findAll() {
         List<Reward> rewards = new ArrayList<>();
-        String sql = "SELECT * FROM reward";
+        String sql = "SELECT id, player_id, name, description, date_awarded FROM reward";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -62,53 +60,52 @@ public class RewardDaoImpl implements GenericDao<Reward> {
 
         } catch (SQLException e) {
             System.err.println("Error fetching rewards: " + e.getMessage());
-            e.printStackTrace();
         }
 
         return rewards;
     }
 
     @Override
-    public Reward findById(int id) {
-        String sql = "SELECT * FROM reward WHERE id = ?";
+    public Optional<Reward> findById(int id) {
+        String sql = "SELECT id, player_id, name, description, date_awarded FROM reward WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Reward(
-                            rs.getInt("id"),
-                            rs.getInt("player_id"),
-                            rs.getString("name"),
-                            rs.getString("description"),
-                            rs.getTimestamp("date_awarded").toLocalDateTime()
-                    );
-                }
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Reward reward = new Reward(
+                        rs.getInt("id"),
+                        rs.getInt("player_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getTimestamp("date_awarded").toLocalDateTime()
+                );
+                return Optional.of(reward);
             }
 
         } catch (SQLException e) {
             System.err.println("Error finding reward: " + e.getMessage());
-            e.printStackTrace();
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public void remove(Reward reward) {
+    public boolean remove(Reward reward) {
         String sql = "DELETE FROM reward WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, reward.getId());
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.err.println("Error deleting reward: " + e.getMessage());
-            e.printStackTrace();
+            return false;
         }
     }
 }

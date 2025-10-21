@@ -6,11 +6,8 @@ import model.Decoration;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Implementación del DAO para la entidad Decoration.
- * Gestiona las operaciones CRUD sobre la tabla 'decoration' en la base de datos.
- */
 public class DecorationDaoImpl implements GenericDao<Decoration> {
 
     private Connection getConnection() throws SQLException {
@@ -18,7 +15,7 @@ public class DecorationDaoImpl implements GenericDao<Decoration> {
     }
 
     @Override
-    public void save(Decoration decoration) {
+    public boolean save(Decoration decoration) {
         String sql = "INSERT INTO decoration (name, material, price, room_id) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
@@ -28,24 +25,24 @@ public class DecorationDaoImpl implements GenericDao<Decoration> {
             stmt.setString(2, decoration.getMaterial());
             stmt.setDouble(3, decoration.getPrice());
             stmt.setInt(4, decoration.getRoomId());
-            stmt.executeUpdate();
+            int rows = stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    decoration.setId(rs.getInt(1));
-                }
+                if (rs.next()) decoration.setId(rs.getInt(1));
             }
 
+            return rows > 0;
+
         } catch (SQLException e) {
-            System.err.println("Error inserting decoration: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error saving Decoration: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
     public List<Decoration> findAll() {
         List<Decoration> decorations = new ArrayList<>();
-        String sql = "SELECT * FROM decoration";
+        String sql = "SELECT id, name, material, price, room_id FROM decoration";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -53,99 +50,63 @@ public class DecorationDaoImpl implements GenericDao<Decoration> {
 
             while (rs.next()) {
                 Decoration decoration = new Decoration(
-                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("material"),
                         rs.getDouble("price"),
                         rs.getInt("room_id")
                 );
+                decoration.setId(rs.getInt("id"));
                 decorations.add(decoration);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error fetching decorations: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error fetching Decorations: " + e.getMessage());
         }
 
         return decorations;
     }
 
     @Override
-    public Decoration findById(int id) {
-        String sql = "SELECT * FROM decoration WHERE id = ?";
+    public Optional<Decoration> findById(int id) {
+        String sql = "SELECT id, name, material, price, room_id FROM decoration WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Decoration(
-                            rs.getInt("id"),
-                            rs.getString("name"),
-                            rs.getString("material"),
-                            rs.getDouble("price"),
-                            rs.getInt("room_id")
-                    );
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error finding decoration by ID: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * Devuelve todas las decoraciones asociadas a una sala concreta.
-     *
-     * @param roomId identificador de la sala
-     * @return lista de objetos Decoration correspondientes a esa sala
-     */
-    public List<Decoration> findByRoomId(int roomId) {
-        List<Decoration> decorations = new ArrayList<>();
-        String sql = "SELECT id, name, material, price, room_id FROM decoration WHERE room_id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, roomId);
             ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 Decoration decoration = new Decoration(
-                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("material"),
                         rs.getDouble("price"),
                         rs.getInt("room_id")
                 );
-                decorations.add(decoration);
+                decoration.setId(rs.getInt("id"));
+                return Optional.of(decoration);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error while retrieving decorations for room_id = " + roomId);
-            e.printStackTrace();
+            System.err.println("Error finding Decoration by ID: " + e.getMessage());
         }
 
-        return decorations;
+        return Optional.empty();
     }
 
     @Override
-    public void remove(Decoration decoration) {
+    public boolean remove(Decoration decoration) {
         String sql = "DELETE FROM decoration WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, decoration.getId());
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error deleting decoration: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error deleting Decoration: " + e.getMessage());
+            return false;
         }
     }
 }

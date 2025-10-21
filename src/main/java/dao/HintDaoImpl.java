@@ -6,20 +6,16 @@ import model.Hint;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Implementación del DAO para la entidad Hint.
- * Gestiona las operaciones CRUD sobre la tabla 'hint' en la base de datos.
- */
 public class HintDaoImpl implements GenericDao<Hint> {
 
     private Connection getConnection() throws SQLException {
-        // Usa una única forma de obtener la conexión
         return DatabaseConfig.getInstance().getConnection();
     }
 
     @Override
-    public void save(Hint hint) {
+    public boolean save(Hint hint) {
         String sql = "INSERT INTO hint (description, theme, room_id, price) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
@@ -29,24 +25,24 @@ public class HintDaoImpl implements GenericDao<Hint> {
             stmt.setString(2, hint.getTheme());
             stmt.setInt(3, hint.getRoomId());
             stmt.setDouble(4, hint.getPrice());
-            stmt.executeUpdate();
+            int rows = stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    hint.setId(rs.getInt(1));
-                }
+                if (rs.next()) hint.setId(rs.getInt(1));
             }
 
+            return rows > 0;
+
         } catch (SQLException e) {
-            System.err.println("Error inserting hint: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error saving Hint: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
     public List<Hint> findAll() {
         List<Hint> hints = new ArrayList<>();
-        String sql = "SELECT * FROM hint";
+        String sql = "SELECT id, description, theme, room_id, price FROM hint";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -54,93 +50,63 @@ public class HintDaoImpl implements GenericDao<Hint> {
 
             while (rs.next()) {
                 Hint hint = new Hint(
-                        rs.getInt("id"),
                         rs.getString("description"),
                         rs.getString("theme"),
                         rs.getInt("room_id"),
                         rs.getDouble("price")
                 );
+                hint.setId(rs.getInt("id"));
                 hints.add(hint);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error fetching hints: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error fetching Hints: " + e.getMessage());
         }
 
         return hints;
     }
 
     @Override
-    public Hint findById(int id) {
-        String sql = "SELECT * FROM hint WHERE id = ?";
+    public Optional<Hint> findById(int id) {
+        String sql = "SELECT id, description, theme, room_id, price FROM hint WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Hint(
-                            rs.getInt("id"),
-                            rs.getString("description"),
-                            rs.getString("theme"),
-                            rs.getInt("room_id"),
-                            rs.getDouble("price")
-                    );
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error finding hint by ID: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public List<Hint> findByRoomId(int roomId) {
-        List<Hint> hints = new ArrayList<>();
-        String sql = "SELECT id, description, theme, room_id, price FROM hint WHERE room_id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, roomId);
             ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 Hint hint = new Hint(
-                        rs.getInt("id"),
                         rs.getString("description"),
                         rs.getString("theme"),
                         rs.getInt("room_id"),
                         rs.getDouble("price")
                 );
-                hints.add(hint);
+                hint.setId(rs.getInt("id"));
+                return Optional.of(hint);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error while retrieving hints for room_id = " + roomId);
-            e.printStackTrace();
+            System.err.println("Error finding Hint by ID: " + e.getMessage());
         }
 
-        return hints;
+        return Optional.empty();
     }
 
     @Override
-    public void remove(Hint hint) {
+    public boolean remove(Hint hint) {
         String sql = "DELETE FROM hint WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, hint.getId());
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error deleting hint: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error deleting Hint: " + e.getMessage());
+            return false;
         }
     }
 }
