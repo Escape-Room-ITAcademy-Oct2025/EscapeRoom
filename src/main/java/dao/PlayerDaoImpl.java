@@ -90,6 +90,32 @@ public class PlayerDaoImpl implements GenericDao<Player> {
         return Optional.empty();
     }
 
+    public Optional<Player> findByEmail(String email) {
+        String sql = "SELECT id, name, email FROM player WHERE email = ?";
+
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Player player = new Player(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("email")
+                    );
+                    return Optional.of(player);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding player by email: " + e.getMessage());
+        }
+
+        return Optional.empty();
+    }
+
 
     @Override
     public boolean remove(Player player) {
