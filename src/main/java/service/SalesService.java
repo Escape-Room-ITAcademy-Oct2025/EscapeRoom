@@ -3,14 +3,15 @@ package service;
 import dao.PlayerDaoImpl;
 import dao.RoomDaoImpl;
 import dao.TicketDaoImpl;
+import exception.InvalidDataException;
+import exception.DataNotFoundException;
+import exception.OperationFailedException;
 import model.Player;
 import model.Room;
 import model.Ticket;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 public class SalesService {
 
@@ -25,16 +26,18 @@ public class SalesService {
     }
 
     public String sellTicket(String playerName, String playerEmail, int roomId, double price) {
+        // 🔹 Validaciones básicas
         if (playerName == null || playerName.isBlank()) {
-            return "❌ Player name cannot be empty.";
+            throw new InvalidDataException("❌ Player name cannot be empty.");
         }
         if (playerEmail == null || playerEmail.isBlank()) {
-            return "❌ Player email cannot be empty.";
+            throw new InvalidDataException("❌ Player email cannot be empty.");
         }
         if (price <= 0) {
-            return "❌ Invalid ticket price. Must be greater than 0.";
+            throw new InvalidDataException("❌ Invalid ticket price. Must be greater than 0.");
         }
 
+        // 🔹 Buscar o crear jugador
         Optional<Player> existingPlayer = playerDao.findByEmail(playerEmail);
         Player player;
 
@@ -43,24 +46,26 @@ public class SalesService {
         } else {
             Player newPlayer = new Player(playerName, playerEmail);
             boolean created = playerDao.save(newPlayer);
-            if (!created) return "❌ Could not create player.";
-            player = playerDao.findByEmail(playerEmail).orElse(null);
-            if (player == null) return "⚠️ Player created but not found afterward.";
+            if (!created) {
+                throw new OperationFailedException("❌ Could not create player.");
+            }
+
+            player = playerDao.findByEmail(playerEmail)
+                    .orElseThrow(() -> new DataNotFoundException("⚠️ Player created but not found afterward."));
         }
 
-        Optional<Room> optRoom = roomDao.findById(roomId);
-        if (optRoom.isEmpty()) {
-            return "❌ Room not found.";
-        }
-        Room room = optRoom.get();
+        // 🔹 Buscar sala
+        Room room = roomDao.findById(roomId)
+                .orElseThrow(() -> new DataNotFoundException("❌ Room not found."));
 
+        // 🔹 Crear ticket
         Ticket ticket = new Ticket(player.getId(), room.getId(), price);
         boolean saved = ticketDao.save(ticket);
-
         if (!saved) {
-            return "❌ Could not create ticket.";
+            throw new OperationFailedException("❌ Could not create ticket.");
         }
 
+        // ✅ Mensaje final bonito (sin cambios de estilo)
         return String.format(
                 "✅ Ticket created successfully!\nPlayer: %s (%s)\nRoom: %s (%.2f €)\nDate: %s",
                 player.getName(),
@@ -72,7 +77,11 @@ public class SalesService {
     }
 
     public List<Ticket> findAllTickets() {
-        return ticketDao.findAll();
+        List<Ticket> tickets = ticketDao.findAll();
+        if (tickets == null || tickets.isEmpty()) {
+            throw new DataNotFoundException("⚠️ No tickets found.");
+        }
+        return tickets;
     }
 
     public Optional<Ticket> findTicketById(int id) {
@@ -88,6 +97,7 @@ public class SalesService {
 
     public boolean deleteTicketById(int id) {
         Optional<Ticket> ticketOpt = ticketDao.findById(id);
-        return ticketOpt.map(ticketDao::remove).orElse(false);
+        return ticketOpt.map(ticketDao::remove)
+                .orElseThrow(() -> new DataNotFoundException("❌ Ticket not found with ID: " + id));
     }
 }
