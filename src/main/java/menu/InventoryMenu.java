@@ -1,11 +1,8 @@
 package menu;
 
-import model.*;
-import service.EscapeRoomService;
 import service.InventoryService;
 import utils.InputUtils;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class InventoryMenu {
@@ -28,11 +25,11 @@ public class InventoryMenu {
                 case 1 -> addRoom();
                 case 2 -> addHint();
                 case 3 -> addDecoration();
-                case 4 -> showInventory();
-                case 5 -> showTotalValue();
-                case 6 -> deleteEntity("Room");
-                case 7 -> deleteEntity("Hint");
-                case 8 -> deleteEntity("Decoration");
+                case 4 -> System.out.println(inventoryService.showFullInventory());
+                case 5 -> System.out.println(inventoryService.showTotalValue());
+                case 6 -> deleteRoom();
+                case 7 -> deleteHint();
+                case 8 -> deleteDecoration();
                 case 0 -> System.out.println("Returning to Admin Menu...");
                 default -> System.out.println("❌ Invalid option. Try again.");
             }
@@ -57,111 +54,53 @@ public class InventoryMenu {
     }
 
     private void addRoom() {
-        System.out.println("\n=== Available Escape Rooms ===");
-        EscapeRoomService escapeRoomService = new EscapeRoomService();
-        escapeRoomService.findAllEscapeRooms().forEach(System.out::println);
-
-        System.out.print("Enter EscapeRoom ID to assign this room to: ");
+        System.out.print("Enter Escape Room ID: ");
         int escapeRoomId = InputUtils.readInt(scanner);
-
-        Optional<EscapeRoom> er = escapeRoomService.findAllEscapeRooms()
-                .stream()
-                .filter(e -> e.getId() == escapeRoomId)
-                .findFirst();
-
-        if (er.isEmpty()) {
-            System.out.println("❌ EscapeRoom ID not found. Operation cancelled.");
-            return;
-        }
-
-        System.out.print("Enter room name: ");
-        String name = scanner.nextLine().trim();
-
+        String name = InputUtils.readNonEmptyString(scanner, "Enter room name: ");
         System.out.print("Enter difficulty (EASY, MEDIUM, HARD): ");
-        Difficulty difficulty;
-        try {
-            difficulty = Difficulty.valueOf(scanner.nextLine().trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid difficulty! Defaulting to EASY.");
-            difficulty = Difficulty.EASY;
-        }
-
-        System.out.print("Enter room price (€): ");
+        String difficulty = scanner.nextLine();
+        System.out.print("Enter price (€): ");
         double price = InputUtils.readDouble(scanner);
-
-        Room room = new Room(name, difficulty, price);
-        room.setEscapeRoomId(escapeRoomId);
-
-        inventoryService.saveRoom(room);
-        System.out.println("✅ Room added successfully: " + room.getName() + " (EscapeRoom ID: " + escapeRoomId + ")");
+        System.out.println(inventoryService.addRoom(name, difficulty, price, escapeRoomId));
     }
 
     private void addHint() {
-        System.out.print("Enter hint description: ");
-        String description = scanner.nextLine();
-
+        String description = InputUtils.readNonEmptyString(scanner, "Enter hint description: ");
         System.out.print("Enter hint theme: ");
         String theme = scanner.nextLine();
-
         System.out.print("Enter related Room ID: ");
         int roomId = InputUtils.readInt(scanner);
-
         System.out.print("Enter hint price (€): ");
         double price = InputUtils.readDouble(scanner);
-
-        Hint hint = new Hint(description, theme, roomId, price);
-        inventoryService.saveHint(hint);
-        System.out.println("✅ Hint added successfully.");
+        System.out.println(inventoryService.addHint(description, theme, roomId, price));
     }
 
     private void addDecoration() {
-        System.out.print("Enter decoration name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Enter decoration material: ");
+        String name = InputUtils.readNonEmptyString(scanner, "Enter decoration name: ");
+        System.out.print("Enter material: ");
         String material = scanner.nextLine();
-
         System.out.print("Enter related Room ID: ");
         int roomId = InputUtils.readInt(scanner);
-
         System.out.print("Enter decoration price (€): ");
         double price = InputUtils.readDouble(scanner);
-
-        Decoration decoration = new Decoration(name, material, price, roomId);
-        inventoryService.saveDecoration(decoration);
-        System.out.println("✅ Decoration added successfully.");
+        System.out.println(inventoryService.addDecoration(name, material, roomId, price));
     }
 
-    private void showInventory() {
-        System.out.println("\n=== 🧩 ROOMS ===");
-        inventoryService.findAllRooms().forEach(System.out::println);
-
-        System.out.println("\n=== 💡 HINTS ===");
-        inventoryService.findAllHints().forEach(System.out::println);
-
-        System.out.println("\n=== 🎨 DECORATIONS ===");
-        inventoryService.findAllDecorations().forEach(System.out::println);
-    }
-
-    private void showTotalValue() {
-        double total = inventoryService.calculateTotalInventoryValue();
-        System.out.printf("💰 Total Inventory Value: %.2f €%n", total);
-    }
-
-    private void deleteEntity(String type) {
-        System.out.printf("Enter the %s ID to delete: ", type);
+    private void deleteRoom() {
+        System.out.print("Enter Room ID to delete: ");
         int id = InputUtils.readInt(scanner);
+        System.out.println(inventoryService.deleteRoomById(id));
+    }
 
-        boolean deleted = switch (type) {
-            case "Room" -> inventoryService.removeRoomById(id);
-            case "Hint" -> inventoryService.removeHintById(id);
-            case "Decoration" -> inventoryService.removeDecorationById(id);
-            default -> false;
-        };
+    private void deleteHint() {
+        System.out.print("Enter Hint ID to delete: ");
+        int id = InputUtils.readInt(scanner);
+        System.out.println(inventoryService.deleteHintById(id));
+    }
 
-        if (deleted)
-            System.out.printf("🗑️ %s deleted successfully.%n", type);
-        else
-            System.out.printf("❌ %s not found.%n", type);
+    private void deleteDecoration() {
+        System.out.print("Enter Decoration ID to delete: ");
+        int id = InputUtils.readInt(scanner);
+        System.out.println(inventoryService.deleteDecorationById(id));
     }
 }
