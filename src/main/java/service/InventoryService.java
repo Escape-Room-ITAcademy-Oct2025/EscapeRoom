@@ -3,12 +3,15 @@ package service;
 import dao.DecorationDaoImpl;
 import dao.HintDaoImpl;
 import dao.RoomDaoImpl;
+import exception.DecorationNotFoundException;
+import exception.HintNotFoundException;
+import exception.RoomNotFoundException;
 import model.Decoration;
 import model.Hint;
 import model.Room;
 
 import java.util.List;
-import java.util.Optional;
+
 
 public class InventoryService {
 
@@ -31,8 +34,8 @@ public class InventoryService {
     }
 
     public Room findRoomById(int id) {
-        Optional<Room> roomOpt = roomDao.findById(id);
-        return roomOpt.orElse(null);
+        return roomDao.findById(id)
+                .orElseThrow(() -> new RoomNotFoundException("Room with ID: " + id + " was not found"));
     }
 
     public boolean removeRoom(Room room) {
@@ -40,8 +43,9 @@ public class InventoryService {
     }
 
     public boolean removeRoomById(int id) {
-        Optional<Room> roomOpt = roomDao.findById(id);
-        return roomOpt.map(roomDao::remove).orElse(false);
+        Room room = roomDao.findById(id)
+                .orElseThrow(() -> new RoomNotFoundException("Room with ID: " + id + " was not found"));
+        return roomDao.remove(room);
     }
 
     public boolean saveHint(Hint hint) {
@@ -53,8 +57,8 @@ public class InventoryService {
     }
 
     public Hint findHintById(int id) {
-        Optional<Hint> hintOpt = hintDao.findById(id);
-        return hintOpt.orElse(null);
+        return hintDao.findById(id)
+                .orElseThrow(() -> new HintNotFoundException("Hint with ID: " + id + " was not found"));
     }
 
     public boolean removeHint(Hint hint) {
@@ -62,8 +66,9 @@ public class InventoryService {
     }
 
     public boolean removeHintById(int id) {
-        Optional<Hint> hintOpt = hintDao.findById(id);
-        return hintOpt.map(hintDao::remove).orElse(false);
+        Hint hint = hintDao.findById(id)
+                .orElseThrow(() -> new HintNotFoundException("Hint with ID: " + id + " was not found"));
+        return hintDao.remove(hint);
     }
 
     public boolean saveDecoration(Decoration decoration) {
@@ -75,8 +80,8 @@ public class InventoryService {
     }
 
     public Decoration findDecorationById(int id) {
-        Optional<Decoration> decOpt = decorationDao.findById(id);
-        return decOpt.orElse(null);
+        return decorationDao.findById(id)
+                .orElseThrow(() -> new DecorationNotFoundException("Decoration with ID: " + id + " was not found"));
     }
 
     public boolean removeDecoration(Decoration decoration) {
@@ -84,8 +89,9 @@ public class InventoryService {
     }
 
     public boolean removeDecorationById(int id) {
-        Optional<Decoration> decOpt = decorationDao.findById(id);
-        return decOpt.map(decorationDao::remove).orElse(false);
+        Decoration dec = decorationDao.findById(id)
+                .orElseThrow(() -> new DecorationNotFoundException("Decoration with ID: " + id + " was not found"));
+        return decorationDao.remove(dec);
     }
 
     public double calculateTotalInventoryValue() {
