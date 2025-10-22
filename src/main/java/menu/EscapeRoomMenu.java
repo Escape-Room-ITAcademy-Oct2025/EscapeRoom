@@ -1,10 +1,8 @@
 package menu;
 
-import model.EscapeRoom;
 import service.EscapeRoomService;
 import utils.InputUtils;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class EscapeRoomMenu {
