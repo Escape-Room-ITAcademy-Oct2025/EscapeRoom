@@ -3,14 +3,14 @@ package service;
 import dao.PlayerDaoImpl;
 import dao.RoomDaoImpl;
 import dao.TicketDaoImpl;
+import exception.InvalidPlayerDataException;
+import exception.RoomNotFoundException;
+import exception.TicketCreationException;
 import model.Player;
 import model.Room;
 import model.Ticket;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
 
 public class SalesService {
 
@@ -26,39 +26,33 @@ public class SalesService {
 
     public String sellTicket(String playerName, String playerEmail, int roomId, double price) {
         if (playerName == null || playerName.isBlank()) {
-            return "❌ Player name cannot be empty.";
+            throw new InvalidPlayerDataException("Player name cannot be empty.");
         }
         if (playerEmail == null || playerEmail.isBlank()) {
-            return "❌ Player email cannot be empty.";
+            throw new InvalidPlayerDataException("Player email cannot be empty.");
         }
         if (price <= 0) {
-            return "❌ Invalid ticket price. Must be greater than 0.";
+            throw new TicketCreationException("Invalid ticket price. Must be greater than 0.");
         }
 
-        Optional<Player> existingPlayer = playerDao.findByEmail(playerEmail);
-        Player player;
+        Player player = playerDao.findByEmail(playerEmail)
+                .orElseGet(() -> {
+                    Player newPlayer = new Player(playerName, playerEmail);
+                    boolean created = playerDao.save(newPlayer);
+                    if (!created) {
+                        throw new TicketCreationException("Could not create player.");
+                    }
+                    return playerDao.findByEmail(playerEmail)
+                            .orElseThrow(() -> new TicketCreationException("Player created but not found afterward."));
+                });
 
-        if (existingPlayer.isPresent()) {
-            player = existingPlayer.get();
-        } else {
-            Player newPlayer = new Player(playerName, playerEmail);
-            boolean created = playerDao.save(newPlayer);
-            if (!created) return "❌ Could not create player.";
-            player = playerDao.findByEmail(playerEmail).orElse(null);
-            if (player == null) return "⚠️ Player created but not found afterward.";
-        }
-
-        Optional<Room> optRoom = roomDao.findById(roomId);
-        if (optRoom.isEmpty()) {
-            return "❌ Room not found.";
-        }
-        Room room = optRoom.get();
+        Room room = roomDao.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " was not found."));
 
         Ticket ticket = new Ticket(player.getId(), room.getId(), price);
         boolean saved = ticketDao.save(ticket);
-
         if (!saved) {
-            return "❌ Could not create ticket.";
+            throw new TicketCreationException("Could not create ticket.");
         }
 
         return String.format(
@@ -67,7 +61,7 @@ public class SalesService {
                 player.getEmail(),
                 room.getName(),
                 price,
-                ticket.getPurchaseDate().toString()
+                ticket.getPurchaseDate()
         );
     }
 
@@ -75,8 +69,9 @@ public class SalesService {
         return ticketDao.findAll();
     }
 
-    public Optional<Ticket> findTicketById(int id) {
-        return ticketDao.findById(id);
+    public Ticket findTicketById(int id) {
+        return ticketDao.findById(id)
+                .orElseThrow(() -> new TicketCreationException("Ticket with ID " + id + " was not found."));
     }
 
     public double calculateTotalRevenue() {
@@ -87,7 +82,8 @@ public class SalesService {
     }
 
     public boolean deleteTicketById(int id) {
-        Optional<Ticket> ticketOpt = ticketDao.findById(id);
-        return ticketOpt.map(ticketDao::remove).orElse(false);
+        Ticket ticket = ticketDao.findById(id)
+                .orElseThrow(() -> new TicketCreationException("Ticket with ID " + id + " was not found."));
+        return ticketDao.remove(ticket);
     }
 }
