@@ -2,45 +2,96 @@ package service;
 
 import dao.PlayerDaoImpl;
 import dao.RoomDaoImpl;
+import dao.TicketDaoImpl;
 import model.Player;
 import model.Room;
+import model.Ticket;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class CertificateService {
 
     private final PlayerDaoImpl playerDao;
     private final RoomDaoImpl roomDao;
+    private final TicketDaoImpl ticketDao;
 
     public CertificateService() {
         this.playerDao = new PlayerDaoImpl();
         this.roomDao = new RoomDaoImpl();
+        this.ticketDao = new TicketDaoImpl();
     }
 
-    public String generateCertificate(int playerId, int roomId) {
-        Optional<Player> playerOpt = playerDao.findById(playerId);
-        Optional<Room> roomOpt = roomDao.findById(roomId);
+    public List<Player> getAllPlayers() {
+        return playerDao.findAll();
+    }
 
-        if (playerOpt.isEmpty() || roomOpt.isEmpty()) {
-            return "❌ Error: Player or Room not found.";
+    public List<Ticket> getTicketsByPlayerId(int playerId) {
+        return ticketDao.findByPlayerId(playerId);
+    }
+
+    public Optional<String> generateCertificateFromTicket(int ticketId) {
+        Optional<Ticket> optTicket = ticketDao.findById(ticketId);
+        if (optTicket.isEmpty()) {
+            System.out.println("❌ Ticket not found.");
+            return Optional.empty();
         }
 
-        Player player = playerOpt.get();
-        Room room = roomOpt.get();
+        Ticket ticket = optTicket.get();
 
-        return """
-                🎉 ESCAPE ROOM CERTIFICATE 🎉
-                Player: %s
-                Room: %s
-                Difficulty: %s
-                Completion Date: %s
-                Congratulations for completing the challenge!
-                """.formatted(
+        Optional<Player> optPlayer = playerDao.findById(ticket.getPlayerId());
+        if (optPlayer.isEmpty()) {
+            System.out.println("❌ Player not found for this ticket.");
+            return Optional.empty();
+        }
+
+        Optional<Room> optRoom = roomDao.findById(ticket.getRoomId());
+        if (optRoom.isEmpty()) {
+            System.out.println("❌ Room not found for this ticket.");
+            return Optional.empty();
+        }
+
+        Player player = optPlayer.get();
+        Room room = optRoom.get();
+
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(ticket.getPurchaseDate(), now);
+
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+
+        String timeOfCompletion = String.format("%02dh %02dm", hours, minutes);
+
+        String certificate = """
+            =====================================================
+                    📜 ESCAPE ROOM COMPLETION CERTIFICATE
+            =====================================================
+            Player: %s
+            Room:   %s
+            Difficulty:  %s
+            -----------------------------------------------------
+            Ticket ID: #%d
+            Started:   %s
+            Completed: %s
+            Time of completion: %s
+            -----------------------------------------------------
+            Congratulations, %s! You have successfully completed
+            the escape room "%s". 🎉
+            =====================================================
+            """.formatted(
                 player.getName(),
                 room.getName(),
                 room.getDifficulty(),
-                LocalDateTime.now().toString()
+                ticket.getId(),
+                ticket.getPurchaseDate(),
+                now,
+                timeOfCompletion,
+                player.getName(),
+                room.getName()
         );
+
+        return Optional.of(certificate);
     }
 }
