@@ -51,7 +51,7 @@ public class EscapeRoomService {
         }
 
         EscapeRoom er = maybeRoom.get();
-        boolean deleted = escapeRoomDao.delete(er);
+        boolean deleted = escapeRoomDao.remove(er);
 
         if (deleted) {
             return "✅ Escape Room deleted successfully: " + er.getName();
