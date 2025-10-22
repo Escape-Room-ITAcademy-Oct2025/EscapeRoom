@@ -95,6 +95,35 @@ public class TicketDaoImpl implements GenericDao<Ticket> {
         return Optional.empty();
     }
 
+    public List<Ticket> findByPlayerId(int playerId) {
+        List<Ticket> tickets = new ArrayList<>();
+        String sql = "SELECT id, player_id, room_id, price, purchase_date FROM ticket WHERE player_id = ?";
+
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, playerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Ticket ticket = new Ticket(
+                            rs.getInt("id"),
+                            rs.getInt("player_id"),
+                            rs.getInt("room_id"),
+                            rs.getTimestamp("purchase_date").toLocalDateTime(),
+                            rs.getDouble("price")
+                    );
+                    tickets.add(ticket);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding tickets by player ID: " + e.getMessage());
+        }
+
+        return tickets;
+    }
+
     @Override
     public boolean remove(Ticket ticket) {
         String sql = "DELETE FROM ticket WHERE id = ?";
