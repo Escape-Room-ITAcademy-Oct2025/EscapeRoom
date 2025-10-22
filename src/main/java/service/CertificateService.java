@@ -3,6 +3,8 @@ package service;
 import dao.PlayerDaoImpl;
 import dao.RoomDaoImpl;
 import dao.TicketDaoImpl;
+import exception.PlayerNotFoundException;
+import exception.TicketNotFoundException;
 import model.Player;
 import model.Room;
 import model.Ticket;
@@ -29,28 +31,29 @@ public class CertificateService {
     }
 
     public List<Ticket> getTicketsByPlayerId(int playerId) {
-        return ticketDao.findByPlayerId(playerId);
+        List<Ticket> tickets = ticketDao.findByPlayerId(playerId);
+        if (tickets == null || tickets.isEmpty()) {
+            throw new TicketNotFoundException("⚠️ This player has no tickets.");
+        }
+        return tickets;
     }
 
     public Optional<String> generateCertificateFromTicket(int ticketId) {
         Optional<Ticket> optTicket = ticketDao.findById(ticketId);
         if (optTicket.isEmpty()) {
-            System.out.println("❌ Ticket not found.");
-            return Optional.empty();
+            throw new TicketNotFoundException("❌ Ticket not found.");
         }
 
         Ticket ticket = optTicket.get();
 
         Optional<Player> optPlayer = playerDao.findById(ticket.getPlayerId());
         if (optPlayer.isEmpty()) {
-            System.out.println("❌ Player not found for this ticket.");
-            return Optional.empty();
+            throw new PlayerNotFoundException("❌ Player not found for this ticket.");
         }
 
         Optional<Room> optRoom = roomDao.findById(ticket.getRoomId());
         if (optRoom.isEmpty()) {
-            System.out.println("❌ Room not found for this ticket.");
-            return Optional.empty();
+            throw new IllegalStateException("❌ Room not found for this ticket.");
         }
 
         Player player = optPlayer.get();
