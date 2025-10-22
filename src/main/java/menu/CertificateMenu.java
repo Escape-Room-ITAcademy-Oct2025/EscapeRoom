@@ -49,7 +49,7 @@ public class CertificateMenu {
             return;
         }
 
-        System.out.println("\nAvailable players:");
+        System.out.println("\nPick one of the available players:");
         players.forEach(p -> System.out.printf("  [%d] %s (%s)%n", p.getId(), p.getName(), p.getEmail()));
 
         int playerId = InputUtils.readInt(scanner);
