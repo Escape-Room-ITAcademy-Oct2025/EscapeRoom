@@ -3,6 +3,7 @@ package service;
 import dao.DecorationDaoImpl;
 import dao.HintDaoImpl;
 import dao.RoomDaoImpl;
+import exception.*;
 import model.Decoration;
 import model.Difficulty;
 import model.EscapeRoom;
@@ -29,96 +30,102 @@ public class InventoryService {
     public String addRoom(String name, String difficultyInput, double price, int escapeRoomId) {
         Optional<EscapeRoom> er = escapeRoomService.findEscapeRoomById(escapeRoomId);
         if (er.isEmpty()) {
-            return "❌ Escape Room ID not found. Operation cancelled.";
+            throw new EscapeRoomNotFoundException("❌ Escape Room ID not found. Operation cancelled.");
         }
 
         if (name == null || name.isBlank()) {
-            return "❌ Room name cannot be empty.";
+            throw new InvalidInputException("❌ Room name cannot be empty.");
         }
 
         Difficulty difficulty;
         try {
             difficulty = Difficulty.valueOf(difficultyInput.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            difficulty = Difficulty.EASY;
-            return "⚠️ Invalid difficulty! Defaulting to EASY.";
+            throw new InvalidInputException("⚠️ Invalid difficulty. Valid values: EASY, MEDIUM, HARD.");
         }
 
         Room room = new Room(name, difficulty, price);
         room.setEscapeRoomId(escapeRoomId);
 
-        boolean saved = roomDao.save(room);
-        if (saved)
-            return "✅ Room added successfully: " + room.getName() + " (EscapeRoom ID: " + escapeRoomId + ")";
-        else
-            return "❌ Error saving room. Please try again.";
+        if (!roomDao.save(room)) {
+            throw new RuntimeException("❌ Error saving room. Please try again.");
+        }
+
+        return "✅ Room added successfully: " + room.getName() + " (EscapeRoom ID: " + escapeRoomId + ")";
     }
 
     public String listAllRooms() {
         List<Room> rooms = roomDao.findAll();
-        if (rooms.isEmpty()) return "⚠️ No rooms found.";
+        if (rooms.isEmpty()) throw new RoomNotFoundException("⚠️ No rooms found.");
         StringBuilder sb = new StringBuilder("\n=== 🧩 ROOMS ===\n");
         rooms.forEach(r -> sb.append(r).append("\n"));
         return sb.toString();
     }
 
     public String deleteRoomById(int id) {
-        Optional<Room> roomOpt = roomDao.findById(id);
-        if (roomOpt.isEmpty()) return "❌ Room not found.";
-        boolean deleted = roomDao.remove(roomOpt.get());
-        return deleted ? "🗑️ Room deleted successfully." : "❌ Error deleting room.";
+        Room room = roomDao.findById(id).orElseThrow(() -> new RoomNotFoundException("❌ Room not found."));
+        if (!roomDao.remove(room)) {
+            throw new RuntimeException("❌ Error deleting room.");
+        }
+        return "🗑️ Room deleted successfully.";
     }
 
     public String addHint(String description, String theme, int roomId, double price) {
         if (description == null || description.isBlank()) {
-            return "❌ Hint description cannot be empty.";
+            throw new InvalidInputException("❌ Hint description cannot be empty.");
         }
 
         Hint hint = new Hint(description, theme, roomId, price);
-        boolean saved = hintDao.save(hint);
-        return saved ? "✅ Hint added successfully." : "❌ Error saving hint.";
+        if (!hintDao.save(hint)) {
+            throw new RuntimeException("❌ Error saving hint.");
+        }
+        return "✅ Hint added successfully.";
     }
 
     public String listAllHints() {
         List<Hint> hints = hintDao.findAll();
-        if (hints.isEmpty()) return "⚠️ No hints found.";
+        if (hints.isEmpty()) throw new HintNotFoundException("⚠️ No hints found.");
         StringBuilder sb = new StringBuilder("\n=== 💡 HINTS ===\n");
         hints.forEach(h -> sb.append(h).append("\n"));
         return sb.toString();
     }
 
     public String deleteHintById(int id) {
-        Optional<Hint> hintOpt = hintDao.findById(id);
-        if (hintOpt.isEmpty()) return "❌ Hint not found.";
-        boolean deleted = hintDao.remove(hintOpt.get());
-        return deleted ? "🗑️ Hint deleted successfully." : "❌ Error deleting hint.";
+        Hint hint = hintDao.findById(id).orElseThrow(() -> new HintNotFoundException("❌ Hint not found."));
+        if (!hintDao.remove(hint)) {
+            throw new RuntimeException("❌ Error deleting hint.");
+        }
+        return "🗑️ Hint deleted successfully.";
     }
 
     public String addDecoration(String name, String material, int roomId, double price) {
         if (name == null || name.isBlank()) {
-            return "❌ Decoration name cannot be empty.";
+            throw new InvalidInputException("❌ Decoration name cannot be empty.");
         }
 
         Decoration decoration = new Decoration(name, material, price, roomId);
-        boolean saved = decorationDao.save(decoration);
-        return saved ? "✅ Decoration added successfully." : "❌ Error saving decoration.";
+        if (!decorationDao.save(decoration)) {
+            throw new RuntimeException("❌ Error saving decoration.");
+        }
+        return "✅ Decoration added successfully.";
     }
 
     public String listAllDecorations() {
         List<Decoration> decorations = decorationDao.findAll();
-        if (decorations.isEmpty()) return "⚠️ No decorations found.";
+        if (decorations.isEmpty()) throw new DecorationNotFoundException("⚠️ No decorations found.");
         StringBuilder sb = new StringBuilder("\n=== 🎨 DECORATIONS ===\n");
         decorations.forEach(d -> sb.append(d).append("\n"));
         return sb.toString();
     }
 
     public String deleteDecorationById(int id) {
-        Optional<Decoration> decOpt = decorationDao.findById(id);
-        if (decOpt.isEmpty()) return "❌ Decoration not found.";
-        boolean deleted = decorationDao.remove(decOpt.get());
-        return deleted ? "🗑️ Decoration deleted successfully." : "❌ Error deleting decoration.";
+        Decoration decoration = decorationDao.findById(id)
+                .orElseThrow(() -> new DecorationNotFoundException("❌ Decoration not found."));
+        if (!decorationDao.remove(decoration)) {
+            throw new RuntimeException("❌ Error deleting decoration.");
+        }
+        return "🗑️ Decoration deleted successfully.";
     }
-
 
     public String showFullInventory() {
         return listAllRooms() + listAllHints() + listAllDecorations();
