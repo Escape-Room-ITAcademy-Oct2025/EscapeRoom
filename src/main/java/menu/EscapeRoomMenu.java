@@ -46,51 +46,18 @@ public class EscapeRoomMenu {
     }
 
     private void createEscapeRoom() {
-        System.out.print("Enter the name of the Escape Room: ");
-        String name = scanner.nextLine().trim();
-
-        if (name.isEmpty()) {
-            System.out.println("Name cannot be empty.");
-            return;
-        }
-
-        EscapeRoom escapeRoom = new EscapeRoom(name);
-        boolean success = escapeRoomService.createEscapeRoom(escapeRoom);
-
-        if (success)
-            System.out.println("✅ Escape Room created successfully: " + escapeRoom);
-        else
-            System.out.println("❌ Error creating Escape Room. Please try again.");
+        String name = InputUtils.readNonEmptyString(scanner, "Enter the name of the Escape Room: ");
+        System.out.println(escapeRoomService.createEscapeRoom(name));
     }
 
     private void listEscapeRooms() {
-        System.out.println("\n=== LIST OF ESCAPE ROOMS ===");
-        var escapeRooms = escapeRoomService.findAllEscapeRooms();
-
-        if (escapeRooms.isEmpty()) {
-            System.out.println("No Escape Rooms found.");
-            return;
-        }
-
-        escapeRooms.forEach(System.out::println);
+        System.out.println(escapeRoomService.listEscapeRooms());
     }
+
 
     private void deleteEscapeRoom() {
         System.out.print("Enter the ID of the Escape Room to delete: ");
         int id = InputUtils.readInt(scanner);
-
-        Optional<EscapeRoom> maybeRoom = escapeRoomService.findEscapeRoomById(id);
-
-        if (maybeRoom.isPresent()) {
-            EscapeRoom er = maybeRoom.get();
-            boolean deleted = escapeRoomService.deleteEscapeRoom(er);
-
-            if (deleted)
-                System.out.println("✅ Escape Room deleted successfully: " + er.getName());
-            else
-                System.out.println("❌ Error deleting Escape Room. Try again.");
-        } else {
-            System.out.println("No Escape Room found with ID " + id);
-        }
+        System.out.println(escapeRoomService.deleteEscapeRoomById(id));
     }
 }
