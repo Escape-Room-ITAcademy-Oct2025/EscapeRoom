@@ -23,7 +23,7 @@ public class SalesMenu {
             option = InputUtils.readInt(scanner);
 
             switch (option) {
-                case 1 -> sellTicket();
+                case 1 -> sellTicketFlow();
                 case 2 -> showTotalRevenue();
                 case 3 -> listTickets();
                 case 0 -> System.out.println("Returning to Admin Menu...");
@@ -44,22 +44,16 @@ public class SalesMenu {
         System.out.print("Select an option: ");
     }
 
-    private void sellTicket() {
-        System.out.print("Enter Player ID: ");
-        int playerId = InputUtils.readInt(scanner);
-
-        System.out.print("Enter Room ID: ");
+    private void sellTicketFlow() {
+        String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
+        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+        System.out.print("Enter room ID: ");
         int roomId = InputUtils.readInt(scanner);
-
         System.out.print("Enter ticket price (€): ");
         double price = InputUtils.readDouble(scanner);
 
-        boolean success = salesService.sellTicket(playerId, roomId, price);
-
-        if (success)
-            System.out.println("✅ Ticket sold successfully!");
-        else
-            System.out.println("❌ Error selling ticket.");
+        String result = salesService.sellTicket(name, email, roomId, price);
+        System.out.println("\n" + result);
     }
 
     private void showTotalRevenue() {
