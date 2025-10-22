@@ -1,6 +1,9 @@
 package service;
 
 import dao.EscapeRoomDaoImpl;
+import exception.DataNotFoundException;
+import exception.InvalidDataException;
+import exception.OperationFailedException;
 import model.EscapeRoom;
 
 import java.util.List;
@@ -12,23 +15,23 @@ public class EscapeRoomService {
 
     public String createEscapeRoom(String name) {
         if (name == null || name.isBlank()) {
-            return "❌ Escape Room name cannot be empty.";
+            throw new InvalidDataException("❌ Escape Room name cannot be empty.");
         }
 
         EscapeRoom escapeRoom = new EscapeRoom(name);
         boolean created = escapeRoomDao.save(escapeRoom);
 
-        if (created) {
-            return "✅ Escape Room created successfully: " + escapeRoom.getName();
-        } else {
-            return "❌ Error creating Escape Room. Please try again.";
+        if (!created) {
+            throw new OperationFailedException("❌ Error creating Escape Room. Please try again.");
         }
+
+        return "✅ Escape Room created successfully: " + escapeRoom.getName();
     }
 
     public String listEscapeRooms() {
         List<EscapeRoom> rooms = escapeRoomDao.findAll();
         if (rooms.isEmpty()) {
-            return "⚠️ No Escape Rooms found.";
+            throw new DataNotFoundException("⚠️ No Escape Rooms found.");
         }
 
         StringBuilder sb = new StringBuilder("\n=== LIST OF ESCAPE ROOMS ===\n");
@@ -37,7 +40,11 @@ public class EscapeRoomService {
     }
 
     public List<EscapeRoom> findAllEscapeRooms() {
-        return escapeRoomDao.findAll();
+        List<EscapeRoom> rooms = escapeRoomDao.findAll();
+        if (rooms.isEmpty()) {
+            throw new DataNotFoundException("⚠️ No Escape Rooms found.");
+        }
+        return rooms;
     }
 
     public Optional<EscapeRoom> findEscapeRoomById(int id) {
@@ -45,18 +52,14 @@ public class EscapeRoomService {
     }
 
     public String deleteEscapeRoomById(int id) {
-        Optional<EscapeRoom> maybeRoom = escapeRoomDao.findById(id);
-        if (maybeRoom.isEmpty()) {
-            return "❌ No Escape Room found with ID " + id;
-        }
+        EscapeRoom er = escapeRoomDao.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("❌ No Escape Room found with ID " + id));
 
-        EscapeRoom er = maybeRoom.get();
         boolean deleted = escapeRoomDao.remove(er);
-
-        if (deleted) {
-            return "✅ Escape Room deleted successfully: " + er.getName();
-        } else {
-            return "❌ Error deleting Escape Room. Try again.";
+        if (!deleted) {
+            throw new OperationFailedException("❌ Error deleting Escape Room. Try again.");
         }
+
+        return "✅ Escape Room deleted successfully: " + er.getName();
     }
 }
