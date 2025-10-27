@@ -26,7 +26,7 @@ public class SalesService {
     }
 
     public String sellTicket(String playerName, String playerEmail, int roomId, double price) {
-        // 🔹 Validaciones básicas
+
         if (playerName == null || playerName.isBlank()) {
             throw new InvalidDataException("❌ Player name cannot be empty.");
         }
@@ -37,7 +37,6 @@ public class SalesService {
             throw new InvalidDataException("❌ Invalid ticket price. Must be greater than 0.");
         }
 
-        // 🔹 Buscar o crear jugador
         Optional<Player> existingPlayer = playerDao.findByEmail(playerEmail);
         Player player;
 
@@ -51,21 +50,20 @@ public class SalesService {
             }
 
             player = playerDao.findByEmail(playerEmail)
-                    .orElseThrow(() -> new DataNotFoundException("⚠️ Player created but not found afterward."));
+                    .orElseThrow(() ->
+                            new DataNotFoundException("⚠️ Player created but not found afterward."));
         }
 
-        // 🔹 Buscar sala
         Room room = roomDao.findById(roomId)
-                .orElseThrow(() -> new DataNotFoundException("❌ Room not found."));
+                .orElseThrow(() ->
+                        new DataNotFoundException("❌ Room not found."));
 
-        // 🔹 Crear ticket
         Ticket ticket = new Ticket(player.getId(), room.getId(), price);
         boolean saved = ticketDao.save(ticket);
         if (!saved) {
             throw new OperationFailedException("❌ Could not create ticket.");
         }
 
-        // ✅ Mensaje final bonito (sin cambios de estilo)
         return String.format(
                 "✅ Ticket created successfully!\nPlayer: %s (%s)\nRoom: %s (%.2f €)\nDate: %s",
                 player.getName(),
@@ -98,6 +96,8 @@ public class SalesService {
     public boolean deleteTicketById(int id) {
         Optional<Ticket> ticketOpt = ticketDao.findById(id);
         return ticketOpt.map(ticketDao::remove)
-                .orElseThrow(() -> new DataNotFoundException("❌ Ticket not found with ID: " + id));
+                .orElseThrow(() ->
+                        new DataNotFoundException("❌ Ticket not found with ID: " + id));
     }
 }
+

@@ -2,6 +2,9 @@ package menu;
 
 import service.SalesService;
 import utils.InputUtils;
+import exception.InvalidDataException;
+import exception.DataNotFoundException;
+import exception.OperationFailedException;
 
 import java.util.Scanner;
 
@@ -22,12 +25,18 @@ public class SalesMenu {
             printMenuOptions();
             option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> sellTicketFlow();
-                case 2 -> showTotalRevenue();
-                case 3 -> listTickets();
-                case 0 -> System.out.println("Returning to Admin Menu...");
-                default -> System.out.println("❌ Invalid option, try again.");
+            try {
+                switch (option) {
+                    case 1 -> sellTicketFlow();
+                    case 2 -> showTotalRevenue();
+                    case 3 -> listTickets();
+                    case 0 -> System.out.println("Returning to Admin Menu...");
+                    default -> System.out.println("❌ Invalid option, try again.");
+                }
+            } catch (InvalidDataException | DataNotFoundException | OperationFailedException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("⚠️ Unexpected error: " + e.getMessage());
             }
 
             if (option != 0) InputUtils.pause(scanner);

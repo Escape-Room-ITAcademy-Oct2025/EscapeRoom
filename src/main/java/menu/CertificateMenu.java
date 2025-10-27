@@ -1,11 +1,14 @@
 package menu;
 
+import exception.PlayerNotFoundException;
+import exception.TicketNotFoundException;
 import model.Player;
 import model.Ticket;
 import service.CertificateService;
 import utils.InputUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class CertificateMenu {
@@ -24,10 +27,18 @@ public class CertificateMenu {
             printMenuOptions();
             option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> generateCertificateFlow();
-                case 0 -> System.out.println("Returning to Admin Menu...");
-                default -> System.out.println("❌ Invalid option, please try again.");
+            try {
+                switch (option) {
+                    case 1 -> generateCertificateFlow();
+                    case 0 -> System.out.println("Returning to Admin Menu...");
+                    default -> System.out.println("❌ Invalid option, please try again.");
+                }
+            } catch (PlayerNotFoundException | TicketNotFoundException e) {
+                System.out.println(e.getMessage());
+            } catch (IllegalStateException e) {
+                System.out.println("⚠️ Internal error: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("⚠️ Unexpected error occurred: " + e.getMessage());
             }
 
             if (option != 0) InputUtils.pause(scanner);
@@ -53,12 +64,9 @@ public class CertificateMenu {
         players.forEach(p -> System.out.printf("  [%d] %s (%s)%n", p.getId(), p.getName(), p.getEmail()));
 
         int playerId = InputUtils.readInt(scanner);
-        List<Ticket> tickets = certificateService.getTicketsByPlayerId(playerId);
 
-        if (tickets.isEmpty()) {
-            System.out.println("⚠️ This player has no tickets.");
-            return;
-        }
+        List<Ticket> tickets = certificateService.getTicketsByPlayerId(playerId);
+        // certificateService ya lanza TicketNotFoundException si no hay tickets
 
         System.out.println("\nTickets for this player:");
         tickets.forEach(t -> System.out.printf(
@@ -69,10 +77,7 @@ public class CertificateMenu {
         System.out.print("Enter ticket ID to generate certificate: ");
         int ticketId = InputUtils.readInt(scanner);
 
-        certificateService.generateCertificateFromTicket(ticketId)
-                .ifPresentOrElse(
-                        System.out::println,
-                        () -> System.out.println("❌ Could not generate certificate.")
-                );
+        Optional<String> certificate = certificateService.generateCertificateFromTicket(ticketId);
+        certificate.ifPresent(System.out::println);
     }
 }

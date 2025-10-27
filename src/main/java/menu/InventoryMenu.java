@@ -2,6 +2,7 @@ package menu;
 
 import service.InventoryService;
 import utils.InputUtils;
+import exception.*;
 
 import java.util.Scanner;
 
@@ -21,17 +22,23 @@ public class InventoryMenu {
             printMenu();
             option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> addRoom();
-                case 2 -> addHint();
-                case 3 -> addDecoration();
-                case 4 -> System.out.println(inventoryService.showFullInventory());
-                case 5 -> System.out.println(inventoryService.showTotalValue());
-                case 6 -> deleteRoom();
-                case 7 -> deleteHint();
-                case 8 -> deleteDecoration();
-                case 0 -> System.out.println("Returning to Admin Menu...");
-                default -> System.out.println("❌ Invalid option. Try again.");
+            try {
+                switch (option) {
+                    case 1 -> addRoom();
+                    case 2 -> addHint();
+                    case 3 -> addDecoration();
+                    case 4 -> System.out.println(inventoryService.showFullInventory());
+                    case 5 -> System.out.println(inventoryService.showTotalValue());
+                    case 6 -> deleteRoom();
+                    case 7 -> deleteHint();
+                    case 8 -> deleteDecoration();
+                    case 0 -> System.out.println("Returning to Admin Menu...");
+                    default -> System.out.println("❌ Invalid option. Try again.");
+                }
+            } catch (EscapeRoomNotFoundException | RoomNotFoundException | HintNotFoundException | DecorationNotFoundException | InvalidInputException e) {
+                System.out.println(e.getMessage());
+            } catch (RuntimeException e) {
+                System.out.println("❌ An unexpected error occurred: " + e.getMessage());
             }
 
             if (option != 0) InputUtils.pause(scanner);
