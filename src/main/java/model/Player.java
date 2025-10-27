@@ -1,6 +1,8 @@
 package model;
 
-public class Player {
+import model.observer.Observer;
+
+public class Player implements Observer {
 
     private int id;
     private String name;
@@ -42,6 +44,11 @@ public class Player {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public void update(String eventMessage) {
+        System.out.println("📢 Notification for " + name + ": " + eventMessage);
     }
 
     @Override
