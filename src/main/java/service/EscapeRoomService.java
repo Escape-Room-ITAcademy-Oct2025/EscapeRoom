@@ -1,17 +1,50 @@
 package service;
 
 import dao.EscapeRoomDaoImpl;
-import exception.DataNotFoundException;
-import exception.InvalidDataException;
-import exception.OperationFailedException;
+import exception.*;
 import model.EscapeRoom;
+import model.observer.Observer;
+import model.observer.Subject;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
-public class EscapeRoomService {
 
-    private final EscapeRoomDaoImpl escapeRoomDao = new EscapeRoomDaoImpl();
+public class EscapeRoomService implements Subject {
+
+    private static EscapeRoomService instance;
+
+    public static EscapeRoomService getInstance() {
+        if (instance == null) {
+            instance = new EscapeRoomService();
+        }
+        return instance;
+    }
+
+    private EscapeRoomService() {
+        this.escapeRoomDao = new EscapeRoomDaoImpl();
+    }
+
+    private final EscapeRoomDaoImpl escapeRoomDao;
+    private final List<Observer> observers = new ArrayList<>();
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(String eventMessage) {
+        for (Observer observer : observers) {
+            observer.update(eventMessage);
+        }
+    }
 
     public String createEscapeRoom(String name) {
         if (name == null || name.isBlank()) {
@@ -24,6 +57,9 @@ public class EscapeRoomService {
         if (!created) {
             throw new OperationFailedException("❌ Error creating Escape Room. Please try again.");
         }
+
+        notifyObservers("[NEW] We are happy to announce that a new escape room has been created: " +
+                escapeRoom.getName());
 
         return "✅ Escape Room created successfully: " + escapeRoom.getName();
     }
@@ -59,6 +95,9 @@ public class EscapeRoomService {
         if (!deleted) {
             throw new OperationFailedException("❌ Error deleting Escape Room. Try again.");
         }
+
+        notifyObservers("[UPDATE] Unfortunately the escape room " + er.getName() +
+                " has been deleted");
 
         return "✅ Escape Room deleted successfully: " + er.getName();
     }
