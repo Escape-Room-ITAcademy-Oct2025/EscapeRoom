@@ -9,22 +9,53 @@ import model.Difficulty;
 import model.EscapeRoom;
 import model.Hint;
 import model.Room;
+import model.observer.Observer;
+import model.observer.Subject;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
-public class InventoryService {
+public class InventoryService implements Subject {
+
+    private static InventoryService instance;
+
+    public static InventoryService getInstance() {
+        if (instance == null) {
+            instance = new InventoryService();
+        }
+        return instance;
+    }
+
+    private InventoryService() {
+        this.roomDao = new RoomDaoImpl();
+        this.hintDao = new HintDaoImpl();
+        this.decorationDao = new DecorationDaoImpl();
+        this.escapeRoomService = EscapeRoomService.getInstance();
+    }
 
     private final RoomDaoImpl roomDao;
     private final HintDaoImpl hintDao;
     private final DecorationDaoImpl decorationDao;
     private final EscapeRoomService escapeRoomService;
+    private final List<Observer> observers = new ArrayList<>();
 
-    public InventoryService() {
-        this.roomDao = new RoomDaoImpl();
-        this.hintDao = new HintDaoImpl();
-        this.decorationDao = new DecorationDaoImpl();
-        this.escapeRoomService = new EscapeRoomService();
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(String eventMessage) {
+        for (Observer observer : observers) {
+            observer.update(eventMessage);
+        }
     }
 
     public String addRoom(String name, String difficultyInput, double price, int escapeRoomId) {
@@ -51,6 +82,10 @@ public class InventoryService {
             throw new RuntimeException("❌ Error saving room. Please try again.");
         }
 
+        String escapeRoomName = er.get().getName();
+        notifyObservers("[NEW] New room created: " + room.getName() +
+                " (Difficulty: " + difficulty + ") in Escape Room: " + escapeRoomName);
+
         return "✅ Room added successfully: " + room.getName() + " (EscapeRoom ID: " + escapeRoomId + ")";
     }
 
@@ -67,6 +102,13 @@ public class InventoryService {
         if (!roomDao.remove(room)) {
             throw new RuntimeException("❌ Error deleting room.");
         }
+
+        Optional<EscapeRoom> er = escapeRoomService.findEscapeRoomById(room.getEscapeRoomId());
+        String escapeRoomName = er.map(EscapeRoom::getName).orElse("Unknown Escape Room");
+
+        notifyObservers("[UPDATE] Unfortunately the room " + room.getName() +
+                " from Escape Room: " + escapeRoomName + " is no longer available.");
+
         return "🗑️ Room deleted successfully.";
     }
 

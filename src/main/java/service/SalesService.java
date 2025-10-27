@@ -9,6 +9,9 @@ import exception.OperationFailedException;
 import model.Player;
 import model.Room;
 import model.Ticket;
+import model.observer.Observer;
+import service.InventoryService;
+import service.EscapeRoomService;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +21,18 @@ public class SalesService {
     private final PlayerDaoImpl playerDao;
     private final RoomDaoImpl roomDao;
     private final TicketDaoImpl ticketDao;
+    private final InventoryService inventoryService;
+    private final EscapeRoomService escapeRoomService;
 
     public SalesService() {
         this.playerDao = new PlayerDaoImpl();
         this.roomDao = new RoomDaoImpl();
         this.ticketDao = new TicketDaoImpl();
+        this.inventoryService = InventoryService.getInstance();
+        this.escapeRoomService = EscapeRoomService.getInstance();
     }
 
     public String sellTicket(String playerName, String playerEmail, int roomId, double price) {
-        // 🔹 Validaciones básicas
         if (playerName == null || playerName.isBlank()) {
             throw new InvalidDataException("❌ Player name cannot be empty.");
         }
@@ -37,7 +43,6 @@ public class SalesService {
             throw new InvalidDataException("❌ Invalid ticket price. Must be greater than 0.");
         }
 
-        // 🔹 Buscar o crear jugador
         Optional<Player> existingPlayer = playerDao.findByEmail(playerEmail);
         Player player;
 
@@ -54,18 +59,15 @@ public class SalesService {
                     .orElseThrow(() -> new DataNotFoundException("⚠️ Player created but not found afterward."));
         }
 
-        // 🔹 Buscar sala
         Room room = roomDao.findById(roomId)
                 .orElseThrow(() -> new DataNotFoundException("❌ Room not found."));
 
-        // 🔹 Crear ticket
         Ticket ticket = new Ticket(player.getId(), room.getId(), price);
         boolean saved = ticketDao.save(ticket);
         if (!saved) {
             throw new OperationFailedException("❌ Could not create ticket.");
         }
 
-        // ✅ Mensaje final bonito (sin cambios de estilo)
         return String.format(
                 "✅ Ticket created successfully!\nPlayer: %s (%s)\nRoom: %s (%.2f €)\nDate: %s",
                 player.getName(),
@@ -100,4 +102,58 @@ public class SalesService {
         return ticketOpt.map(ticketDao::remove)
                 .orElseThrow(() -> new DataNotFoundException("❌ Ticket not found with ID: " + id));
     }
+    public String registerNewPlayer(String name, String email, boolean subscribe) {
+        if (name == null || name.isBlank()) {
+            throw new InvalidDataException("❌ Player name cannot be empty.");
+        }
+        if (email == null || email.isBlank()) {
+            throw new InvalidDataException("❌ Player email cannot be empty.");
+        }
+
+        if (playerDao.findByEmail(email).isPresent()) {
+            throw new OperationFailedException("⚠️ A player with this email already exists.");
+        }
+
+        Player newPlayer = new Player(name, email);
+        boolean created = playerDao.save(newPlayer);
+
+        if (!created) {
+            throw new OperationFailedException("❌ Error registering new player.");
+        }
+
+        if (subscribe) {
+            escapeRoomService.registerObserver(newPlayer);
+            inventoryService.registerObserver(newPlayer);
+            return "✅ Player registered and subscribed to Escape Room updates.";
+        }
+
+        return "✅ Player registered successfully (not subscribed).";
+    }
+
+    public String subscribeExistingPlayer(String email) {
+        Optional<Player> playerOpt = playerDao.findByEmail(email);
+        if (playerOpt.isEmpty()) {
+            throw new DataNotFoundException("❌ No player found with email: " + email);
+        }
+
+        Player player = playerOpt.get();
+        escapeRoomService.registerObserver(player);
+        inventoryService.registerObserver(player);
+
+        return "✅ Player " + player.getName() + " subscribed to Escape Room updates.";
+    }
+
+    public String unsubscribePlayer(String email) {
+        Optional<Player> playerOpt = playerDao.findByEmail(email);
+        if (playerOpt.isEmpty()) {
+            throw new DataNotFoundException("❌ No player found with email: " + email);
+        }
+
+        Player player = playerOpt.get();
+        escapeRoomService.removeObserver(player);
+        inventoryService.removeObserver(player);
+
+        return "🛑 Player " + player.getName() + " unsubscribed from Escape Room updates.";
+    }
+
 }

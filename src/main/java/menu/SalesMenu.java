@@ -26,6 +26,9 @@ public class SalesMenu {
                 case 1 -> sellTicketFlow();
                 case 2 -> showTotalRevenue();
                 case 3 -> listTickets();
+                case 4 -> registerNewPlayerFlow();
+                case 5 -> subscribeExistingPlayerFlow();
+                case 6 -> unsubscribePlayerFlow();
                 case 0 -> System.out.println("Returning to Admin Menu...");
                 default -> System.out.println("❌ Invalid option, try again.");
             }
@@ -40,6 +43,9 @@ public class SalesMenu {
         System.out.println("1. Sell ticket");
         System.out.println("2. Show total revenue (€)");
         System.out.println("3. Show all tickets");
+        System.out.println("4. Register new player");
+        System.out.println("5. Subscribe existing player to updates");
+        System.out.println("6. Unsubscribe player from updates");
         System.out.println("0. Return to Admin Menu");
         System.out.print("Select an option: ");
     }
@@ -65,4 +71,29 @@ public class SalesMenu {
         System.out.println("\n=== ALL TICKETS ===");
         salesService.findAllTickets().forEach(System.out::println);
     }
+
+    private void registerNewPlayerFlow() {
+        String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
+        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+
+        System.out.print("Do you want to subscribe to Escape Room updates? (yes/no): ");
+        String subscribeChoice = scanner.nextLine().trim();
+        boolean subscribe = subscribeChoice.equalsIgnoreCase("yes");
+
+        String result = salesService.registerNewPlayer(name, email, subscribe);
+        System.out.println("\n" + result);
+    }
+
+    private void subscribeExistingPlayerFlow() {
+        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+        String result = salesService.subscribeExistingPlayer(email);
+        System.out.println("\n" + result);
+    }
+
+    private void unsubscribePlayerFlow() {
+        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+        String result = salesService.unsubscribePlayer(email);
+        System.out.println("\n" + result);
+    }
+
 }

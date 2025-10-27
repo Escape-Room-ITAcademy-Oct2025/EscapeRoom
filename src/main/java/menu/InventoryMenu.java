@@ -11,7 +11,7 @@ public class InventoryMenu {
     private final Scanner scanner;
 
     public InventoryMenu(Scanner scanner) {
-        this.inventoryService = new InventoryService();
+        this.inventoryService = InventoryService.getInstance();
         this.scanner = scanner;
     }
 
