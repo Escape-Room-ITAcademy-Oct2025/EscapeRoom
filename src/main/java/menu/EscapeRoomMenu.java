@@ -11,7 +11,7 @@ public class EscapeRoomMenu {
     private final Scanner scanner;
 
     public EscapeRoomMenu(Scanner scanner) {
-        this.escapeRoomService = new EscapeRoomService();
+        this.escapeRoomService = EscapeRoomService.getInstance();
         this.scanner = scanner;
     }
 
