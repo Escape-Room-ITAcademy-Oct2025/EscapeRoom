@@ -41,7 +41,7 @@ public class RoomDaoImpl implements GenericDao<Room> {
     @Override
     public List<Room> findAll() {
         List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT id, name, difficulty, price FROM room";
+        String sql = "SELECT id, name, difficulty, price, escape_room_id FROM room";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
