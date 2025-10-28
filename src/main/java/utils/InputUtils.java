@@ -23,7 +23,14 @@ public class InputUtils {
         while (true) {
             try {
                 String input = scanner.nextLine().trim().replace(",", ".");
-                return Double.parseDouble(input);
+                double value = Double.parseDouble(input);
+
+                if (value <= 0) {
+                    System.out.print("⚠️ Please enter a positive number: ");
+                    continue;
+                }
+
+                return value;
             } catch (NumberFormatException e) {
                 System.out.print("⚠️ Invalid input. Please enter a valid decimal number: ");
             }

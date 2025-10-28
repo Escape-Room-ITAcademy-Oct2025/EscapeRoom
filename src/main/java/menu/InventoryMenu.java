@@ -85,8 +85,7 @@ public class InventoryMenu {
     private void addHint() {
         try {
             String description = InputUtils.readNonEmptyString(scanner, "Enter hint description: ");
-            System.out.print("Enter hint theme: ");
-            String theme = scanner.nextLine();
+            String theme = InputUtils.readNonEmptyString(scanner, "Enter hint theme: ");
             System.out.print("Enter related Room ID: ");
             int roomId = InputUtils.readInt(scanner);
             System.out.print("Enter hint price (€): ");
@@ -105,8 +104,7 @@ public class InventoryMenu {
     private void addDecoration() {
         try {
             String name = InputUtils.readNonEmptyString(scanner, "Enter decoration name: ");
-            System.out.print("Enter material: ");
-            String material = scanner.nextLine();
+            String material = InputUtils.readNonEmptyString(scanner, "Enter material: ");
             System.out.print("Enter related Room ID: ");
             int roomId = InputUtils.readInt(scanner);
             System.out.print("Enter decoration price (€): ");
