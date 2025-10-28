@@ -74,7 +74,7 @@ public class InventoryMenu {
 
             System.out.println(inventoryService.addRoom(name, difficulty, price, escapeRoomId));
 
-        } catch (EscapeRoomNotFoundException | InvalidInputException e) {
+        } catch (EscapeRoomNotFoundException | InvalidInputException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("⚠️ Invalid numeric value. Try again.");
@@ -94,7 +94,7 @@ public class InventoryMenu {
 
             System.out.println(inventoryService.addHint(description, theme, roomId, price));
 
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("⚠️ Invalid numeric value.");
@@ -114,7 +114,7 @@ public class InventoryMenu {
 
             System.out.println(inventoryService.addDecoration(name, material, roomId, price));
 
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("⚠️ Invalid numeric value.");
@@ -133,8 +133,8 @@ public class InventoryMenu {
     private void showTotalValue() {
         try {
             System.out.println(inventoryService.showTotalValue());
-        } catch (Exception e) {
-            System.out.println("⚠️ Could not calculate total value.");
+        } catch (DatabaseOperationException e) {
+            System.out.println("⚠️ Could not calculate total value: " + e.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class InventoryMenu {
             int id = InputUtils.readInt(scanner);
             System.out.println(inventoryService.deleteRoomById(id));
 
-        } catch (RoomNotFoundException e) {
+        } catch (RoomNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("⚠️ Invalid ID format.");
@@ -158,7 +158,7 @@ public class InventoryMenu {
             int id = InputUtils.readInt(scanner);
             System.out.println(inventoryService.deleteHintById(id));
 
-        } catch (HintNotFoundException e) {
+        } catch (HintNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("⚠️ Invalid ID format.");
@@ -172,7 +172,7 @@ public class InventoryMenu {
             int id = InputUtils.readInt(scanner);
             System.out.println(inventoryService.deleteDecorationById(id));
 
-        } catch (DecorationNotFoundException e) {
+        } catch (DecorationNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("⚠️ Invalid ID format.");
