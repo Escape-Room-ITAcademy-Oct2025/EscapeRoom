@@ -87,7 +87,6 @@ public class InventoryService implements Subject {
 
     public String listAllRooms() {
         List<Room> rooms = roomDao.findAll();
-        if (rooms.isEmpty()) throw new RoomNotFoundException("⚠️ No rooms found.");
         StringBuilder sb = new StringBuilder("\n=== 🧩 ROOMS ===\n");
         rooms.forEach(r -> sb.append(r).append("\n"));
         return sb.toString();
@@ -125,7 +124,6 @@ public class InventoryService implements Subject {
 
     public String listAllHints() {
         List<Hint> hints = hintDao.findAll();
-        if (hints.isEmpty()) throw new HintNotFoundException("⚠️ No hints found.");
         StringBuilder sb = new StringBuilder("\n=== 💡 HINTS ===\n");
         hints.forEach(h -> sb.append(h).append("\n"));
         return sb.toString();
@@ -159,7 +157,6 @@ public class InventoryService implements Subject {
 
     public String listAllDecorations() {
         List<Decoration> decorations = decorationDao.findAll();
-        if (decorations.isEmpty()) throw new DecorationNotFoundException("⚠️ No decorations found.");
         StringBuilder sb = new StringBuilder("\n=== 🎨 DECORATIONS ===\n");
         decorations.forEach(d -> sb.append(d).append("\n"));
         return sb.toString();
