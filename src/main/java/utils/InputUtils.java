@@ -37,13 +37,12 @@ public class InputUtils {
         }
     }
 
-    public static String readNonEmptyString(Scanner scanner, String prompt) {
+    public static String readNonEmptyString(Scanner scanner) {
         String input;
         do {
-            System.out.print(prompt);
             input = scanner.nextLine().trim();
             if (input.isEmpty()) {
-                System.out.println("Input cannot be empty. Try again.");
+                System.out.println("⚠️ Input cannot be empty. Try again.");
             }
         } while (input.isEmpty());
         return input;
