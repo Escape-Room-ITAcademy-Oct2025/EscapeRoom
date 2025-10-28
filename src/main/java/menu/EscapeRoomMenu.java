@@ -2,7 +2,9 @@ package menu;
 
 import service.EscapeRoomService;
 import utils.InputUtils;
+import exception.*;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class EscapeRoomMenu {
@@ -18,15 +20,21 @@ public class EscapeRoomMenu {
     public void start() {
         int option;
         do {
-            printMenuOptions();
-            option = InputUtils.readInt(scanner);
+            try {
+                printMenuOptions();
+                option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> createEscapeRoom();
-                case 2 -> listEscapeRooms();
-                case 3 -> deleteEscapeRoom();
-                case 0 -> System.out.println("Returning to main menu...");
-                default -> System.out.println("❌ Invalid option. Try again.");
+                switch (option) {
+                    case 1 -> createEscapeRoom();
+                    case 2 -> listEscapeRooms();
+                    case 3 -> deleteEscapeRoom();
+                    case 0 -> System.out.println("Returning to main menu...");
+                    default -> System.out.println("❌ Invalid option. Try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("⚠️ Invalid input. Enter a number.");
+                scanner.nextLine();
+                option = -1;
             }
 
             if (option != 0) InputUtils.pause(scanner);
@@ -44,18 +52,41 @@ public class EscapeRoomMenu {
     }
 
     private void createEscapeRoom() {
-        String name = InputUtils.readNonEmptyString(scanner, "Enter the name of the Escape Room: ");
-        System.out.println(escapeRoomService.createEscapeRoom(name));
+        try {
+            String name = InputUtils.readNonEmptyString(scanner, "Enter the name of the Escape Room: ");
+            System.out.println(escapeRoomService.createEscapeRoom(name));
+
+        } catch (InvalidDataException | OperationFailedException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("⚠️ Unexpected error creating escape room.");
+        }
     }
 
     private void listEscapeRooms() {
-        System.out.println(escapeRoomService.listEscapeRooms());
+        try {
+            System.out.println(escapeRoomService.listEscapeRooms());
+
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("⚠️ Unexpected error listing escape rooms.");
+        }
     }
 
-
     private void deleteEscapeRoom() {
-        System.out.print("Enter the ID of the Escape Room to delete: ");
-        int id = InputUtils.readInt(scanner);
-        System.out.println(escapeRoomService.deleteEscapeRoomById(id));
+        try {
+            System.out.print("Enter the ID of the Escape Room to delete: ");
+            int id = InputUtils.readInt(scanner);
+            System.out.println(escapeRoomService.deleteEscapeRoomById(id));
+
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid ID. Enter a correct number.");
+            scanner.nextLine();
+        } catch (DataNotFoundException | OperationFailedException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("⚠️ Unexpected error deleting escape room.");
+        }
     }
 }
