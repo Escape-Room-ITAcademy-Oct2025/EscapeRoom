@@ -12,6 +12,30 @@ The goal of the exercise is to apply **Object-Oriented Programming (OOP)** princ
 Developed as part of the **Java Back-End Development Bootcamp** at *IT Academy Barcelona*.
 
 ---
+### 🎯 Key Features
+
+- [X] Create a new Escape Room with a unique name
+- [X] Add a new room with its respective difficulty level
+- [X] Incorporate thematic clues to enrich the gaming experience
+- [X] Introduce decorative objects to create a unique atmosphere in the rooms
+- [X] Show the updated inventory, displaying the available quantities of each element (rooms, hints, and decorative objects)
+- [X] View the total value in euros of the virtual Escape Room inventory
+- [X] Allow the removal of rooms, hints, or decorative objects from the inventory
+- [X] Offer functionality to issue certificates for completing puzzles, recording player achievements during their Escape Room experience
+- [X] Provide possible gifts or rewards in recognition of players' skills and problem-solving ability
+- [X] Generate sales tickets for the different players
+- [X] Calculate and display the total revenue generated from ticket sales for the virtual Escape Room
+- [X] Notify users about important events in the Escape Room, such as the addition of new rooms or the creation of a new Escape Room
+- [X] Allow users to register to receive notifications when relevant events occur
+
+---
+### 💾 Database Schema Overview
+
+Below is the database structure for the Escape Room system:
+
+![Database UML](docs/db-diagram.png)
+
+---
 
 ## 💻 Technologies Used
 
@@ -82,38 +106,12 @@ mvn clean compile exec:java
 ```bash
 mvn test
 ```
-
----
-
-## 🌐 Deployment
-
-The project is designed for **local or educational environments**, but can easily be deployed to production using Docker.
-
-### 1️⃣ Build the Docker image
-```bash
-docker build -t escaperoom-app .
-```
-
-### 2️⃣ Run together with MySQL
-```bash
-docker compose up -d
-```
-
-### 3️⃣ Environment variables (optional)
-You can customize your database connection in `src/main/resources/db.properties`:
-
-```properties
-db.url=jdbc:mysql://localhost:3307/escaperoom_db
-db.user=escaperoom
-db.password=escaperoom123
-```
-
 ---
 
 ### 🧑‍💻 Authors
 
-- **Adrià Lorente** – *Service & Integration Lead*
-- **Andrés [Last Name]** – *Data Layer Lead*
+- [**Adrià Lorente**](https://github.com/alaw810)
+- [**Andrés Calvo**](https://github.com/Andrescalvo22)
 
 Developed at [IT Academy Barcelona](https://www.barcelonactiva.cat/itacademy)  
 as part of the **Java Back-End Development Bootcamp** (2025).
