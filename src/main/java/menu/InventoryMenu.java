@@ -1,6 +1,7 @@
 package menu;
 
 import model.EscapeRoom;
+import model.Hint;
 import model.Room;
 import service.EscapeRoomService;
 import service.InventoryService;
@@ -262,17 +263,49 @@ public class InventoryMenu {
     }
 
     private void deleteHint() {
+        List<Hint> hints;
         try {
-            System.out.print("Enter Hint ID to delete: ");
+            hints = inventoryService.getAllHints();
+        } catch (HintNotFoundException e) {
+            System.out.println("⚠️ No hints available to delete.");
+            return;
+        }
+
+        System.out.println("\n=== Available Hints ===");
+        hints.forEach(h ->
+                System.out.printf("ID: %d | Description: %s | Room ID: %d | Price: %.2f €%n",
+                        h.getId(), h.getDescription(), h.getRoomId(), h.getPrice())
+        );
+
+        try {
+            System.out.print("\nEnter Hint ID to delete: ");
             int id = InputUtils.readInt(scanner);
+
+            Optional<Hint> hintOpt = hints.stream().filter(h -> h.getId() == id).findFirst();
+            if (hintOpt.isEmpty()) {
+                System.out.println("❌ Invalid Hint ID. Operation cancelled.");
+                return;
+            }
+
+            Hint hint = hintOpt.get();
+            System.out.printf("⚠️ Are you sure you want to delete this hint? \"%s\" (yes/no): ",
+                    hint.getDescription());
+            String confirm = scanner.nextLine().trim().toLowerCase();
+            if (!confirm.equals("yes")) {
+                System.out.println("❎ Deletion cancelled.");
+                return;
+            }
+
             System.out.println(inventoryService.deleteHintById(id));
+
         } catch (HintNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
-            System.out.println("⚠️ Invalid ID format.");
+            System.out.println("⚠️ Invalid numeric value.");
             scanner.nextLine();
         }
     }
+
 
     private void deleteDecoration() {
         try {

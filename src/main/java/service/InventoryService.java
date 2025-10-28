@@ -131,13 +131,21 @@ public class InventoryService implements Subject {
         return sb.toString();
     }
 
+    public List<Hint> getAllHints() {
+        List<Hint> hints = hintDao.findAll();
+        if (hints.isEmpty()) throw new HintNotFoundException("⚠️ No hints found.");
+        return hints;
+    }
+
     public String deleteHintById(int id) {
-        Hint hint = hintDao.findById(id).orElseThrow(() -> new HintNotFoundException("❌ Hint not found."));
+        Hint hint = hintDao.findById(id)
+                .orElseThrow(() -> new HintNotFoundException("❌ Hint not found."));
         if (!hintDao.remove(hint)) {
             throw new DatabaseOperationException("❌ Error deleting hint.");
         }
-        return "🗑️ Hint deleted successfully.";
+        return "🗑️ Hint \"" + hint.getDescription() + "\" deleted successfully.";
     }
+
 
     public String addDecoration(String name, String material, int roomId, double price) {
         if (name == null || name.isBlank()) {
