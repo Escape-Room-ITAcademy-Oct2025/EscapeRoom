@@ -1,133 +1,119 @@
-# 🧩 Virtual Escape Room Management System
-
-## 🎯 Overview
-
-A Java console-based application to manage a **virtual Escape Room**, developed following a layered architecture (DAO → Service → Menu → Model).  
-It connects to a **MySQL** database to manage rooms, hints, decorations, tickets, players, and rewards.
+# 🧩 Escape Room Management System
 
 ---
 
-## 🧱 Architecture
+## 📄 Description – Exercise Statement
 
-### 🧩 Project structure
+This project consists of building a **console-based management system** for an Escape Room business.  
+It allows administrators to manage escape rooms, rooms, hints, and decorations, while players receive automatic notifications when new events are created.
 
-```
-src/main/java/
-├── app/
-│   └── Main.java
-├── config/
-│   └── DatabaseConfig.java
-├── dao/
-│   ├── GenericDao.java
-│   ├── EscapeRoomDaoImpl.java
-│   ├── RoomDaoImpl.java
-│   ├── HintDaoImpl.java
-│   ├── DecorationDaoImpl.java
-│   ├── PlayerDaoImpl.java
-│   ├── TicketDaoImpl.java
-│   └── RewardDaoImpl.java
-├── service/
-│   ├── EscapeRoomService.java
-│   ├── InventoryService.java
-│   ├── SalesService.java
-│   └── CertificateService.java
-├── menu/
-│   ├── AdminMenu.java
-│   ├── EscapeRoomMenu.java
-│   ├── InventoryMenu.java
-│   ├── SalesMenu.java
-│   └── CertificateMenu.java
-├── model/
-│   ├── EscapeRoom.java
-│   ├── Room.java
-│   ├── Hint.java
-│   ├── Decoration.java
-│   ├── Player.java
-│   ├── Ticket.java
-│   ├── Reward.java
-│   └── Difficulty.java
-└── utils/
-    └── InputUtils.java
-```
+The goal of the exercise is to apply **Object-Oriented Programming (OOP)** principles, database integration through **JDBC**, and implement the **Observer design pattern** to simulate event-driven updates.
+
+Developed as part of the **Java Back-End Development Bootcamp** at *IT Academy Barcelona*.
 
 ---
 
-## ⚙️ Database
+## 💻 Technologies Used
 
-**Database name:** `escape_room_db`  
-**Engine:** MySQL  
-**Encoding:** `utf8mb4_unicode_ci`
-
-### 🗄️ Tables
-
-- `escape_room` → Escape room metadata
-- `room` → Rooms linked to escape rooms (difficulty, price)
-- `hint` → Thematic hints linked to rooms
-- `decoration` → Decorations for each room
-- `player` → Registered players (name + email)
-- `ticket` → Tickets sold to players (linked to room and player)
-- `reward` → Certificates / achievements linked to players
-
-### ✅ Relationships
-
-| Table | Relationship | On Delete |
-|--------|---------------|------------|
-| `room.escape_room_id` | → `escape_room.id` | CASCADE |
-| `hint.room_id` | → `room.id` | CASCADE |
-| `decoration.room_id` | → `room.id` | CASCADE |
-| `ticket.player_id` | → `player.id` | CASCADE |
-| `ticket.room_id` | → `room.id` | CASCADE |
-| `reward.player_id` | → `player.id` | SET NULL |
+| Category | Tools / Technologies |
+|-----------|----------------------|
+| **Language** | Java 21 |
+| **Database** | MySQL 8 |
+| **Persistence** | JDBC |
+| **Build Tool** | Maven |
+| **Containerization** | Docker & Docker Compose |
+| **Testing** | JUnit 5, AssertJ |
+| **IDE** | IntelliJ IDEA |
+| **Version Control** | Git & GitHub |
 
 ---
 
-## 🧮 Features
+## 📋 Requirements
 
-| Category | Feature |
-|-----------|----------|
-| Escape Rooms | Create, list, and delete Escape Rooms |
-| Inventory | Add / list / delete rooms, hints, decorations |
-| Sales | Sell tickets, list sales, calculate total revenue |
-| Certificates | Generate certificates for completed rooms |
-| Validation | Input checked via `InputUtils` (int, double, strings) |
+Before running this project, ensure you have installed:
+
+- ☕ **Java JDK 21**
+- 🧱 **Apache Maven 3.9+**
+- 🐳 **Docker Desktop** (or Docker Engine + Docker Compose)
+- 🗄️ **MySQL 8.0+**
+- 🧰 IDE such as IntelliJ IDEA or VS Code (optional but recommended)
 
 ---
 
-## 💻 How to Run
+## 🛠️ Installation
 
-### Prerequisites
-
-- Java 21+
-- MySQL running locally (Docker or Workbench)
-- JDBC driver configured
-
-### Steps
-
-1. Clone the repository and open it in IntelliJ IDEA.
-2. Import it as a **Maven project** (if applicable).
-3. Configure database access in `DatabaseConfig.java`.
-4. Run the SQL script (`schema.sql`) to create the database and sample data.
-5. Run `Main.java`.
-
+### 1️⃣ Clone the repository
 ```bash
-javac -d out src/main/java/**/*.java
-java -cp out app.Main
+git clone https://github.com/Escape-Room-ITAcademy-Oct2025/EscapeRoom.git
+cd EscapeRoom
+```
+
+### 2️⃣ Start the MySQL container using Docker
+```bash
+cd docker
+docker compose up -d
+```
+
+This will start:
+- **MySQL** on port `3307`
+
+### 3️⃣ Verify that the database is loaded
+
+The script [`docker/init/init.sql`](docker/init/init.sql) automatically creates:
+- Tables (`escape_room`, `room`, `hint`, `decoration`, `player`, `ticket`, `reward`)
+- Sample records for initial testing
+
+---
+
+## ▶️ Execution
+
+### Option 1 – Run via IntelliJ IDEA
+1. Open the project as a Maven project.
+2. Ensure the database container is running.
+3. Run the `Main` class.
+4. Follow the on-screen menu to manage Escape Rooms, Rooms, and other entities.
+
+### Option 2 – Run from the terminal
+```bash
+mvn clean compile exec:java
+```
+
+### Option 3 – Execute tests
+```bash
+mvn test
 ```
 
 ---
 
+## 🌐 Deployment
 
-## 🏁 Summary
+The project is designed for **local or educational environments**, but can easily be deployed to production using Docker.
 
-A full-stack backend console project with:
-- Multi-layer architecture (DAO–Service–Menu)
-- MySQL persistence
-- Clean code & modular design
-- Exception handling & input validation
-- Enum + Optional usage across DAOs
+### 1️⃣ Build the Docker image
+```bash
+docker build -t escaperoom-app .
+```
+
+### 2️⃣ Run together with MySQL
+```bash
+docker compose up -d
+```
+
+### 3️⃣ Environment variables (optional)
+You can customize your database connection in `src/main/resources/db.properties`:
+
+```properties
+db.url=jdbc:mysql://localhost:3307/escaperoom_db
+db.user=escaperoom
+db.password=escaperoom123
+```
 
 ---
 
-## 🧑‍💻 Authors
-- Andrés Calvo
-- Adrià Lorente
+### 🧑‍💻 Authors
+
+- **Adrià Lorente** – *Service & Integration Lead*
+- **Andrés [Last Name]** – *Data Layer Lead*
+
+Developed at [IT Academy Barcelona](https://www.barcelonactiva.cat/itacademy)  
+as part of the **Java Back-End Development Bootcamp** (2025).
