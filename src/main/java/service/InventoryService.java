@@ -172,13 +172,19 @@ public class InventoryService implements Subject {
         return sb.toString();
     }
 
+    public List<Decoration> getAllDecorations() {
+        List<Decoration> decorations = decorationDao.findAll();
+        if (decorations.isEmpty()) throw new DecorationNotFoundException("⚠️ No decorations found.");
+        return decorations;
+    }
+
     public String deleteDecorationById(int id) {
         Decoration decoration = decorationDao.findById(id)
                 .orElseThrow(() -> new DecorationNotFoundException("❌ Decoration not found."));
         if (!decorationDao.remove(decoration)) {
             throw new DatabaseOperationException("❌ Error deleting decoration.");
         }
-        return "🗑️ Decoration deleted successfully.";
+        return "🗑️ Decoration '" + decoration.getName() + "' deleted successfully.";
     }
 
     public String showFullInventory() {

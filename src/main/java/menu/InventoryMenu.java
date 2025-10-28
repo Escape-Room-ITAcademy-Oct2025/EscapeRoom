@@ -1,5 +1,6 @@
 package menu;
 
+import model.Decoration;
 import model.EscapeRoom;
 import model.Hint;
 import model.Room;
@@ -308,15 +309,51 @@ public class InventoryMenu {
 
 
     private void deleteDecoration() {
+        List<Decoration> decorations;
         try {
-            System.out.print("Enter Decoration ID to delete: ");
+            decorations = inventoryService.getAllDecorations();
+        } catch (DecorationNotFoundException e) {
+            System.out.println("⚠️ No decorations available to delete.");
+            return;
+        }
+
+        System.out.println("\n=== Available Decorations ===");
+        decorations.forEach(d ->
+                System.out.printf("ID: %d | Name: %s | Material: %s | Room ID: %d | Price: %.2f €%n",
+                        d.getId(), d.getName(), d.getMaterial(), d.getRoomId(), d.getPrice())
+        );
+
+        try {
+            System.out.print("\nEnter Decoration ID to delete: ");
             int id = InputUtils.readInt(scanner);
+
+            Optional<Decoration> decorationOpt = decorations.stream()
+                    .filter(d -> d.getId() == id)
+                    .findFirst();
+
+            if (decorationOpt.isEmpty()) {
+                System.out.println("❌ Invalid Decoration ID. Operation cancelled.");
+                return;
+            }
+
+            Decoration decoration = decorationOpt.get();
+            System.out.printf("⚠️ Are you sure you want to delete '%s' ? (yes/no): ",
+                    decoration.getName());
+            String confirm = scanner.nextLine().trim().toLowerCase();
+
+            if (!(confirm.equals("yes") || confirm.equals("y"))) {
+                System.out.println("❎ Deletion cancelled.");
+                return;
+            }
+
             System.out.println(inventoryService.deleteDecorationById(id));
+
         } catch (DecorationNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
-            System.out.println("⚠️ Invalid ID format.");
+            System.out.println("⚠️ Invalid numeric value.");
             scanner.nextLine();
         }
     }
+
 }
