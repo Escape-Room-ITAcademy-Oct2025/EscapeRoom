@@ -1,19 +1,25 @@
 package menu;
 
+import model.EscapeRoom;
+import model.Room;
+import service.EscapeRoomService;
 import service.InventoryService;
 import utils.InputUtils;
 import exception.*;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class InventoryMenu {
 
     private final InventoryService inventoryService;
+    private final EscapeRoomService escapeRoomService;
     private final Scanner scanner;
 
     public InventoryMenu(Scanner scanner) {
         this.inventoryService = InventoryService.getInstance();
+        this.escapeRoomService = EscapeRoomService.getInstance();
         this.scanner = scanner;
     }
 
@@ -63,12 +69,36 @@ public class InventoryMenu {
     }
 
     private void addRoom() {
+        List<EscapeRoom> escapeRooms;
+
         try {
-            System.out.print("Enter Escape Room ID: ");
+            escapeRooms = escapeRoomService.findAllEscapeRooms();
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        System.out.println("\n=== Available Escape Rooms ===");
+        escapeRooms.forEach(er ->
+                System.out.printf("ID: %d | Name: %s%n", er.getId(), er.getName())
+        );
+
+        try {
+            System.out.print("\nEnter Escape Room ID to assign this room to: ");
             int escapeRoomId = InputUtils.readInt(scanner);
-            String name = InputUtils.readNonEmptyString(scanner, "Enter room name: ");
+
+            boolean exists = escapeRooms.stream().anyMatch(er -> er.getId() == escapeRoomId);
+            if (!exists) {
+                System.out.println("❌ Invalid ID. Operation cancelled.");
+                return;
+            }
+
+            System.out.print("Enter room name: ");
+            String name = InputUtils.readNonEmptyString(scanner);
+
             System.out.print("Enter difficulty (EASY, MEDIUM, HARD): ");
-            String difficulty = scanner.nextLine();
+            String difficulty = InputUtils.readNonEmptyString(scanner);
+
             System.out.print("Enter price (€): ");
             double price = InputUtils.readDouble(scanner);
 
@@ -83,11 +113,36 @@ public class InventoryMenu {
     }
 
     private void addHint() {
+        List<Room> rooms;
         try {
-            String description = InputUtils.readNonEmptyString(scanner, "Enter hint description: ");
-            String theme = InputUtils.readNonEmptyString(scanner, "Enter hint theme: ");
-            System.out.print("Enter related Room ID: ");
+            rooms = inventoryService.getAllRooms();
+        } catch (RoomNotFoundException e) {
+            System.out.println("⚠️ No rooms available. Please create one first.");
+            return;
+        }
+
+        System.out.println("\n=== Available Rooms ===");
+        rooms.forEach(r ->
+                System.out.printf("ID: %d | Name: %s | Difficulty: %s%n",
+                        r.getId(), r.getName(), r.getDifficulty())
+        );
+
+        try {
+            System.out.print("\nEnter related Room ID: ");
             int roomId = InputUtils.readInt(scanner);
+
+            boolean roomExists = rooms.stream().anyMatch(r -> r.getId() == roomId);
+            if (!roomExists) {
+                System.out.println("❌ Invalid Room ID. Operation cancelled.");
+                return;
+            }
+
+            System.out.print("Enter hint description: ");
+            String description = InputUtils.readNonEmptyString(scanner);
+
+            System.out.print("Enter hint theme: ");
+            String theme = InputUtils.readNonEmptyString(scanner);
+
             System.out.print("Enter hint price (€): ");
             double price = InputUtils.readDouble(scanner);
 
@@ -101,12 +156,18 @@ public class InventoryMenu {
         }
     }
 
+
     private void addDecoration() {
         try {
-            String name = InputUtils.readNonEmptyString(scanner, "Enter decoration name: ");
-            String material = InputUtils.readNonEmptyString(scanner, "Enter material: ");
+            System.out.print("Enter decoration name: ");
+            String name = InputUtils.readNonEmptyString(scanner);
+
+            System.out.print("Enter material: ");
+            String material = InputUtils.readNonEmptyString(scanner);
+
             System.out.print("Enter related Room ID: ");
             int roomId = InputUtils.readInt(scanner);
+
             System.out.print("Enter decoration price (€): ");
             double price = InputUtils.readDouble(scanner);
 
@@ -141,7 +202,6 @@ public class InventoryMenu {
             System.out.print("Enter Room ID to delete: ");
             int id = InputUtils.readInt(scanner);
             System.out.println(inventoryService.deleteRoomById(id));
-
         } catch (RoomNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
@@ -155,7 +215,6 @@ public class InventoryMenu {
             System.out.print("Enter Hint ID to delete: ");
             int id = InputUtils.readInt(scanner);
             System.out.println(inventoryService.deleteHintById(id));
-
         } catch (HintNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
@@ -169,7 +228,6 @@ public class InventoryMenu {
             System.out.print("Enter Decoration ID to delete: ");
             int id = InputUtils.readInt(scanner);
             System.out.println(inventoryService.deleteDecorationById(id));
-
         } catch (DecorationNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
@@ -178,4 +236,3 @@ public class InventoryMenu {
         }
     }
 }
-

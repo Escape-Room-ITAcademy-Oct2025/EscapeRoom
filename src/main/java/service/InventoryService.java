@@ -15,7 +15,6 @@ import model.observer.Subject;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.List;
 
 public class InventoryService implements Subject {
 
@@ -59,21 +58,11 @@ public class InventoryService implements Subject {
     }
 
     public String addRoom(String name, String difficultyInput, double price, int escapeRoomId) {
-        Optional<EscapeRoom> er = escapeRoomService.findEscapeRoomById(escapeRoomId);
-        if (er.isEmpty()) {
-            throw new EscapeRoomNotFoundException("❌ Escape Room ID not found. Operation cancelled.");
-        }
+        EscapeRoom escapeRoom = escapeRoomService.findEscapeRoomById(escapeRoomId)
+                .orElseThrow(() -> new EscapeRoomNotFoundException("❌ Escape Room ID not found."));
 
-        if (name == null || name.isBlank()) {
-            throw new InvalidInputException("❌ Room name cannot be empty.");
-        }
-
-        Difficulty difficulty;
-        try {
-            difficulty = Difficulty.valueOf(difficultyInput.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new InvalidInputException("⚠️ Invalid difficulty. Valid values: EASY, MEDIUM, HARD.");
-        }
+        validateRoomName(name);
+        Difficulty difficulty = parseDifficulty(difficultyInput);
 
         Room room = new Room(name, difficulty, price);
         room.setEscapeRoomId(escapeRoomId);
@@ -82,11 +71,8 @@ public class InventoryService implements Subject {
             throw new DatabaseOperationException("❌ Error saving room. Please try again.");
         }
 
-        String escapeRoomName = er.get().getName();
-        notifyObservers("[NEW] New room created: " + room.getName() +
-                " (Difficulty: " + difficulty + ") in Escape Room: " + escapeRoomName);
-
-        return "✅ Room added successfully: " + room.getName() + " (EscapeRoom ID: " + escapeRoomId + ")";
+        notifyObservers("[NEW] Room created: " + room.getName() + " (" + difficulty + ") in " + escapeRoom.getName());
+        return "✅ Room " + room.getName() + " created successfully.";
     }
 
     public String listAllRooms() {
@@ -95,6 +81,16 @@ public class InventoryService implements Subject {
         StringBuilder sb = new StringBuilder("\n=== 🧩 ROOMS ===\n");
         rooms.forEach(r -> sb.append(r).append("\n"));
         return sb.toString();
+    }
+
+    public List<Room> getAllRooms() {
+        List<Room> rooms = roomDao.findAll();
+        if (rooms.isEmpty()) throw new RoomNotFoundException("⚠️ No rooms found.");
+        return rooms;
+    }
+
+    public Optional<Room> findRoomById(int id) {
+        return roomDao.findById(id);
     }
 
     public String deleteRoomById(int id) {
@@ -116,6 +112,9 @@ public class InventoryService implements Subject {
         if (description == null || description.isBlank()) {
             throw new InvalidInputException("❌ Hint description cannot be empty.");
         }
+
+        findRoomById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("❌ Room ID not found."));
 
         Hint hint = new Hint(description, theme, roomId, price);
         if (!hintDao.save(hint)) {
@@ -181,4 +180,19 @@ public class InventoryService implements Subject {
         double total = totalRooms + totalHints + totalDecorations;
         return String.format("💰 Total Inventory Value: %.2f €", total);
     }
+
+    private Difficulty parseDifficulty(String input) {
+        try {
+            return Difficulty.valueOf(input.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("⚠️ Invalid difficulty. Valid values: EASY, MEDIUM, HARD.");
+        }
+    }
+
+    private void validateRoomName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new InvalidInputException("❌ Room name cannot be empty.");
+        }
+    }
+
 }

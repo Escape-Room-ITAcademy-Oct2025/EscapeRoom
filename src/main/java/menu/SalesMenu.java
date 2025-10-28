@@ -61,10 +61,15 @@ public class SalesMenu {
 
     private void sellTicketFlow() {
         try {
-            String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
-            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            System.out.print("Enter player name: ");
+            String name = InputUtils.readNonEmptyString(scanner);
+
+            System.out.print("Enter player email: ");
+            String email = InputUtils.readNonEmptyString(scanner);
+
             System.out.print("Enter room ID: ");
             int roomId = InputUtils.readInt(scanner);
+
             System.out.print("Enter ticket price (€): ");
             double price = InputUtils.readDouble(scanner);
 
@@ -95,8 +100,11 @@ public class SalesMenu {
 
     private void registerNewPlayerFlow() {
         try {
-            String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
-            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            System.out.print("Enter player name: ");
+            String name = InputUtils.readNonEmptyString(scanner);
+
+            System.out.print("Enter player email: ");
+            String email = InputUtils.readNonEmptyString(scanner);
 
             System.out.print("Subscribe to updates? (yes/no): ");
             String subscribeChoice = scanner.nextLine().trim();
@@ -111,7 +119,9 @@ public class SalesMenu {
 
     private void subscribeExistingPlayerFlow() {
         try {
-            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            System.out.print("Enter player email: ");
+            String email = InputUtils.readNonEmptyString(scanner);
+
             String result = salesService.subscribeExistingPlayer(email);
             System.out.println("\n" + result);
         } catch (DataNotFoundException e) {
@@ -121,7 +131,9 @@ public class SalesMenu {
 
     private void unsubscribePlayerFlow() {
         try {
-            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            System.out.print("Enter player email: ");
+            String email = InputUtils.readNonEmptyString(scanner);
+
             String result = salesService.unsubscribePlayer(email);
             System.out.println("\n" + result);
         } catch (DataNotFoundException e) {
