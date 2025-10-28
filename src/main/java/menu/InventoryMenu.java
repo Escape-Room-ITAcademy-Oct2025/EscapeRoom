@@ -9,6 +9,7 @@ import exception.*;
 
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class InventoryMenu {
@@ -218,10 +219,40 @@ public class InventoryMenu {
     }
 
     private void deleteRoom() {
+        List<Room> rooms;
+        try {
+            rooms = inventoryService.getAllRooms();
+        } catch (RoomNotFoundException e) {
+            System.out.println("⚠️ No rooms available to delete.");
+            return;
+        }
+
+        System.out.println("\n=== Available Rooms ===");
+        rooms.forEach(r ->
+                System.out.printf("ID: %d | Name: %s | Difficulty: %s%n",
+                        r.getId(), r.getName(), r.getDifficulty())
+        );
+
         try {
             System.out.print("Enter Room ID to delete: ");
             int id = InputUtils.readInt(scanner);
+
+            Optional<Room> roomOpt = rooms.stream().filter(r -> r.getId() == id).findFirst();
+            if (roomOpt.isEmpty()) {
+                System.out.println("❌ Invalid Room ID. Operation cancelled.");
+                return;
+            }
+
+            Room room = roomOpt.get();
+            System.out.printf("⚠️ Are you sure you want to delete '%s'? (yes/no): ", room.getName());
+            String confirm = scanner.nextLine().trim().toLowerCase();
+            if (!confirm.equals("yes")) {
+                System.out.println("❎ Deletion cancelled.");
+                return;
+            }
+
             System.out.println(inventoryService.deleteRoomById(id));
+
         } catch (RoomNotFoundException | DatabaseOperationException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {

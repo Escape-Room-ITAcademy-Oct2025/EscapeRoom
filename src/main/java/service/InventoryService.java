@@ -93,7 +93,9 @@ public class InventoryService implements Subject {
     }
 
     public String deleteRoomById(int id) {
-        Room room = roomDao.findById(id).orElseThrow(() -> new RoomNotFoundException("❌ Room not found."));
+        Room room = roomDao.findById(id)
+                .orElseThrow(() -> new RoomNotFoundException("❌ Room not found."));
+
         if (!roomDao.remove(room)) {
             throw new DatabaseOperationException("❌ Error deleting room.");
         }
@@ -104,7 +106,7 @@ public class InventoryService implements Subject {
         notifyObservers("[UPDATE] Unfortunately the room " + room.getName() +
                 " from Escape Room: " + escapeRoomName + " is no longer available.");
 
-        return "🗑️ Room deleted successfully.";
+        return "🗑️ Room '" + room.getName() + "' and its related items were deleted successfully.";
     }
 
     public String addHint(String description, String theme, int roomId, double price) {
