@@ -79,7 +79,7 @@ public class InventoryService implements Subject {
         room.setEscapeRoomId(escapeRoomId);
 
         if (!roomDao.save(room)) {
-            throw new RuntimeException("❌ Error saving room. Please try again.");
+            throw new DatabaseOperationException("❌ Error saving room. Please try again.");
         }
 
         String escapeRoomName = er.get().getName();
@@ -100,7 +100,7 @@ public class InventoryService implements Subject {
     public String deleteRoomById(int id) {
         Room room = roomDao.findById(id).orElseThrow(() -> new RoomNotFoundException("❌ Room not found."));
         if (!roomDao.remove(room)) {
-            throw new RuntimeException("❌ Error deleting room.");
+            throw new DatabaseOperationException("❌ Error deleting room.");
         }
 
         Optional<EscapeRoom> er = escapeRoomService.findEscapeRoomById(room.getEscapeRoomId());
@@ -119,7 +119,7 @@ public class InventoryService implements Subject {
 
         Hint hint = new Hint(description, theme, roomId, price);
         if (!hintDao.save(hint)) {
-            throw new RuntimeException("❌ Error saving hint.");
+            throw new DatabaseOperationException("❌ Error saving hint.");
         }
         return "✅ Hint added successfully.";
     }
@@ -135,7 +135,7 @@ public class InventoryService implements Subject {
     public String deleteHintById(int id) {
         Hint hint = hintDao.findById(id).orElseThrow(() -> new HintNotFoundException("❌ Hint not found."));
         if (!hintDao.remove(hint)) {
-            throw new RuntimeException("❌ Error deleting hint.");
+            throw new DatabaseOperationException("❌ Error deleting hint.");
         }
         return "🗑️ Hint deleted successfully.";
     }
@@ -147,7 +147,7 @@ public class InventoryService implements Subject {
 
         Decoration decoration = new Decoration(name, material, price, roomId);
         if (!decorationDao.save(decoration)) {
-            throw new RuntimeException("❌ Error saving decoration.");
+            throw new DatabaseOperationException("❌ Error saving decoration.");
         }
         return "✅ Decoration added successfully.";
     }
@@ -164,7 +164,7 @@ public class InventoryService implements Subject {
         Decoration decoration = decorationDao.findById(id)
                 .orElseThrow(() -> new DecorationNotFoundException("❌ Decoration not found."));
         if (!decorationDao.remove(decoration)) {
-            throw new RuntimeException("❌ Error deleting decoration.");
+            throw new DatabaseOperationException("❌ Error deleting decoration.");
         }
         return "🗑️ Decoration deleted successfully.";
     }
