@@ -75,14 +75,6 @@ public class InventoryService implements Subject {
         return "✅ Room " + room.getName() + " created successfully.";
     }
 
-    public String listAllRooms() {
-        List<Room> rooms = roomDao.findAll();
-        if (rooms.isEmpty()) throw new RoomNotFoundException("⚠️ No rooms found.");
-        StringBuilder sb = new StringBuilder("\n=== 🧩 ROOMS ===\n");
-        rooms.forEach(r -> sb.append(r).append("\n"));
-        return sb.toString();
-    }
-
     public List<Room> getAllRooms() {
         List<Room> rooms = roomDao.findAll();
         if (rooms.isEmpty()) throw new RoomNotFoundException("⚠️ No rooms found.");
@@ -91,6 +83,14 @@ public class InventoryService implements Subject {
 
     public Optional<Room> findRoomById(int id) {
         return roomDao.findById(id);
+    }
+
+    public String listAllRooms() {
+        List<Room> rooms = roomDao.findAll();
+        if (rooms.isEmpty()) throw new RoomNotFoundException("⚠️ No rooms found.");
+        StringBuilder sb = new StringBuilder("\n=== 🧩 ROOMS ===\n");
+        rooms.forEach(r -> sb.append(r).append("\n"));
+        return sb.toString();
     }
 
     public String deleteRoomById(int id) {
