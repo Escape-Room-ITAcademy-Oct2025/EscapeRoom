@@ -2,7 +2,9 @@ package menu;
 
 import service.InventoryService;
 import utils.InputUtils;
+import exception.*;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class InventoryMenu {
@@ -18,20 +20,27 @@ public class InventoryMenu {
     public void start() {
         int option;
         do {
-            printMenu();
-            option = InputUtils.readInt(scanner);
+            try {
+                printMenu();
+                option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> addRoom();
-                case 2 -> addHint();
-                case 3 -> addDecoration();
-                case 4 -> System.out.println(inventoryService.showFullInventory());
-                case 5 -> System.out.println(inventoryService.showTotalValue());
-                case 6 -> deleteRoom();
-                case 7 -> deleteHint();
-                case 8 -> deleteDecoration();
-                case 0 -> System.out.println("Returning to Admin Menu...");
-                default -> System.out.println("❌ Invalid option. Try again.");
+                switch (option) {
+                    case 1 -> addRoom();
+                    case 2 -> addHint();
+                    case 3 -> addDecoration();
+                    case 4 -> showFullInventory();
+                    case 5 -> showTotalValue();
+                    case 6 -> deleteRoom();
+                    case 7 -> deleteHint();
+                    case 8 -> deleteDecoration();
+                    case 0 -> System.out.println("Returning to Admin Menu...");
+                    default -> System.out.println("❌ Invalid option. Try again.");
+                }
+
+            } catch (InputMismatchException e) {
+                System.out.println("⚠️ Invalid input. Please enter a number.");
+                scanner.nextLine();
+                option = -1;
             }
 
             if (option != 0) InputUtils.pause(scanner);
@@ -54,53 +63,121 @@ public class InventoryMenu {
     }
 
     private void addRoom() {
-        System.out.print("Enter Escape Room ID: ");
-        int escapeRoomId = InputUtils.readInt(scanner);
-        String name = InputUtils.readNonEmptyString(scanner, "Enter room name: ");
-        System.out.print("Enter difficulty (EASY, MEDIUM, HARD): ");
-        String difficulty = scanner.nextLine();
-        System.out.print("Enter price (€): ");
-        double price = InputUtils.readDouble(scanner);
-        System.out.println(inventoryService.addRoom(name, difficulty, price, escapeRoomId));
+        try {
+            System.out.print("Enter Escape Room ID: ");
+            int escapeRoomId = InputUtils.readInt(scanner);
+            String name = InputUtils.readNonEmptyString(scanner, "Enter room name: ");
+            System.out.print("Enter difficulty (EASY, MEDIUM, HARD): ");
+            String difficulty = scanner.nextLine();
+            System.out.print("Enter price (€): ");
+            double price = InputUtils.readDouble(scanner);
+
+            System.out.println(inventoryService.addRoom(name, difficulty, price, escapeRoomId));
+
+        } catch (EscapeRoomNotFoundException | InvalidInputException e) {
+            System.out.println(e.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid numeric value. Try again.");
+            scanner.nextLine();
+        }
     }
 
     private void addHint() {
-        String description = InputUtils.readNonEmptyString(scanner, "Enter hint description: ");
-        System.out.print("Enter hint theme: ");
-        String theme = scanner.nextLine();
-        System.out.print("Enter related Room ID: ");
-        int roomId = InputUtils.readInt(scanner);
-        System.out.print("Enter hint price (€): ");
-        double price = InputUtils.readDouble(scanner);
-        System.out.println(inventoryService.addHint(description, theme, roomId, price));
+        try {
+            String description = InputUtils.readNonEmptyString(scanner, "Enter hint description: ");
+            System.out.print("Enter hint theme: ");
+            String theme = scanner.nextLine();
+            System.out.print("Enter related Room ID: ");
+            int roomId = InputUtils.readInt(scanner);
+            System.out.print("Enter hint price (€): ");
+            double price = InputUtils.readDouble(scanner);
+
+            System.out.println(inventoryService.addHint(description, theme, roomId, price));
+
+        } catch (InvalidInputException e) {
+            System.out.println(e.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid numeric value.");
+            scanner.nextLine();
+        }
     }
 
     private void addDecoration() {
-        String name = InputUtils.readNonEmptyString(scanner, "Enter decoration name: ");
-        System.out.print("Enter material: ");
-        String material = scanner.nextLine();
-        System.out.print("Enter related Room ID: ");
-        int roomId = InputUtils.readInt(scanner);
-        System.out.print("Enter decoration price (€): ");
-        double price = InputUtils.readDouble(scanner);
-        System.out.println(inventoryService.addDecoration(name, material, roomId, price));
+        try {
+            String name = InputUtils.readNonEmptyString(scanner, "Enter decoration name: ");
+            System.out.print("Enter material: ");
+            String material = scanner.nextLine();
+            System.out.print("Enter related Room ID: ");
+            int roomId = InputUtils.readInt(scanner);
+            System.out.print("Enter decoration price (€): ");
+            double price = InputUtils.readDouble(scanner);
+
+            System.out.println(inventoryService.addDecoration(name, material, roomId, price));
+
+        } catch (InvalidInputException e) {
+            System.out.println(e.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid numeric value.");
+            scanner.nextLine();
+        }
+    }
+
+    private void showFullInventory() {
+        try {
+            System.out.println(inventoryService.showFullInventory());
+        } catch (RoomNotFoundException | HintNotFoundException | DecorationNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void showTotalValue() {
+        try {
+            System.out.println(inventoryService.showTotalValue());
+        } catch (Exception e) {
+            System.out.println("⚠️ Could not calculate total value.");
+        }
     }
 
     private void deleteRoom() {
-        System.out.print("Enter Room ID to delete: ");
-        int id = InputUtils.readInt(scanner);
-        System.out.println(inventoryService.deleteRoomById(id));
+        try {
+            System.out.print("Enter Room ID to delete: ");
+            int id = InputUtils.readInt(scanner);
+            System.out.println(inventoryService.deleteRoomById(id));
+
+        } catch (RoomNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid ID format.");
+            scanner.nextLine();
+        }
     }
 
     private void deleteHint() {
-        System.out.print("Enter Hint ID to delete: ");
-        int id = InputUtils.readInt(scanner);
-        System.out.println(inventoryService.deleteHintById(id));
+        try {
+            System.out.print("Enter Hint ID to delete: ");
+            int id = InputUtils.readInt(scanner);
+            System.out.println(inventoryService.deleteHintById(id));
+
+        } catch (HintNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid ID format.");
+            scanner.nextLine();
+        }
     }
 
     private void deleteDecoration() {
-        System.out.print("Enter Decoration ID to delete: ");
-        int id = InputUtils.readInt(scanner);
-        System.out.println(inventoryService.deleteDecorationById(id));
+        try {
+            System.out.print("Enter Decoration ID to delete: ");
+            int id = InputUtils.readInt(scanner);
+            System.out.println(inventoryService.deleteDecorationById(id));
+
+        } catch (DecorationNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("⚠️ Invalid ID format.");
+            scanner.nextLine();
+        }
     }
 }
+

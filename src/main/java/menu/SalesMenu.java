@@ -2,6 +2,9 @@ package menu;
 
 import service.SalesService;
 import utils.InputUtils;
+import exception.InvalidDataException;
+import exception.DataNotFoundException;
+import exception.OperationFailedException;
 
 import java.util.Scanner;
 
@@ -22,15 +25,21 @@ public class SalesMenu {
             printMenuOptions();
             option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> sellTicketFlow();
-                case 2 -> showTotalRevenue();
-                case 3 -> listTickets();
-                case 4 -> registerNewPlayerFlow();
-                case 5 -> subscribeExistingPlayerFlow();
-                case 6 -> unsubscribePlayerFlow();
-                case 0 -> System.out.println("Returning to Admin Menu...");
-                default -> System.out.println("❌ Invalid option, try again.");
+            try {
+                switch (option) {
+                    case 1 -> sellTicketFlow();
+                    case 2 -> showTotalRevenue();
+                    case 3 -> listTickets();
+                    case 4 -> registerNewPlayerFlow();
+                    case 5 -> subscribeExistingPlayerFlow();
+                    case 6 -> unsubscribePlayerFlow();
+                    case 0 -> System.out.println("Returning to Admin Menu...");
+                    default -> System.out.println("❌ Invalid option, try again.");
+                }
+            } catch (InvalidDataException | DataNotFoundException | OperationFailedException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("⚠️ Unexpected error: " + e.getMessage());
             }
 
             if (option != 0) InputUtils.pause(scanner);
@@ -51,49 +60,72 @@ public class SalesMenu {
     }
 
     private void sellTicketFlow() {
-        String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
-        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
-        System.out.print("Enter room ID: ");
-        int roomId = InputUtils.readInt(scanner);
-        System.out.print("Enter ticket price (€): ");
-        double price = InputUtils.readDouble(scanner);
+        try {
+            String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
+            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            System.out.print("Enter room ID: ");
+            int roomId = InputUtils.readInt(scanner);
+            System.out.print("Enter ticket price (€): ");
+            double price = InputUtils.readDouble(scanner);
 
-        String result = salesService.sellTicket(name, email, roomId, price);
-        System.out.println("\n" + result);
+            String result = salesService.sellTicket(name, email, roomId, price);
+            System.out.println("\n" + result);
+        } catch (InvalidDataException | DataNotFoundException | OperationFailedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void showTotalRevenue() {
-        double total = salesService.calculateTotalRevenue();
-        System.out.printf("💰 Total revenue: %.2f €%n", total);
+        try {
+            double total = salesService.calculateTotalRevenue();
+            System.out.printf("💰 Total revenue: %.2f €%n", total);
+        } catch (Exception e) {
+            System.out.println("⚠️ Error getting revenue: " + e.getMessage());
+        }
     }
 
     private void listTickets() {
-        System.out.println("\n=== ALL TICKETS ===");
-        salesService.findAllTickets().forEach(System.out::println);
+        try {
+            System.out.println("\n=== ALL TICKETS ===");
+            salesService.findAllTickets().forEach(System.out::println);
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void registerNewPlayerFlow() {
-        String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
-        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+        try {
+            String name = InputUtils.readNonEmptyString(scanner, "Enter player name: ");
+            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
 
-        System.out.print("Do you want to subscribe to Escape Room updates? (yes/no): ");
-        String subscribeChoice = scanner.nextLine().trim();
-        boolean subscribe = subscribeChoice.equalsIgnoreCase("yes");
+            System.out.print("Subscribe to updates? (yes/no): ");
+            String subscribeChoice = scanner.nextLine().trim();
+            boolean subscribe = subscribeChoice.equalsIgnoreCase("yes");
 
-        String result = salesService.registerNewPlayer(name, email, subscribe);
-        System.out.println("\n" + result);
+            String result = salesService.registerNewPlayer(name, email, subscribe);
+            System.out.println("\n" + result);
+        } catch (InvalidDataException | OperationFailedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void subscribeExistingPlayerFlow() {
-        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
-        String result = salesService.subscribeExistingPlayer(email);
-        System.out.println("\n" + result);
+        try {
+            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            String result = salesService.subscribeExistingPlayer(email);
+            System.out.println("\n" + result);
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void unsubscribePlayerFlow() {
-        String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
-        String result = salesService.unsubscribePlayer(email);
-        System.out.println("\n" + result);
+        try {
+            String email = InputUtils.readNonEmptyString(scanner, "Enter player email: ");
+            String result = salesService.unsubscribePlayer(email);
+            System.out.println("\n" + result);
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
-
 }

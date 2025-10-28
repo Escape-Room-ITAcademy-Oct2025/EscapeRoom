@@ -2,6 +2,8 @@ package menu;
 
 import service.CertificateService;
 import utils.InputUtils;
+import exception.PlayerNotFoundException;
+import exception.TicketNotFoundException;
 
 import java.util.Scanner;
 
@@ -21,10 +23,16 @@ public class CertificateMenu {
             printMenuOptions();
             option = InputUtils.readInt(scanner);
 
-            switch (option) {
-                case 1 -> certificateService.startCertificateFlow(scanner);
-                case 0 -> System.out.println("Returning to Admin Menu...");
-                default -> System.out.println("❌ Invalid option, please try again.");
+            try {
+                switch (option) {
+                    case 1 -> certificateService.startCertificateFlow(scanner);
+                    case 0 -> System.out.println("Returning to Admin Menu...");
+                    default -> System.out.println("❌ Invalid option, please try again.");
+                }
+            } catch (PlayerNotFoundException | TicketNotFoundException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("⚠️ Unexpected error: " + e.getMessage());
             }
 
             if (option != 0) InputUtils.pause(scanner);
