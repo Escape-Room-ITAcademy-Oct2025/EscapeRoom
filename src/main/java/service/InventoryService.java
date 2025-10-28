@@ -143,6 +143,12 @@ public class InventoryService implements Subject {
         if (name == null || name.isBlank()) {
             throw new InvalidInputException("❌ Decoration name cannot be empty.");
         }
+        if (material == null || material.isBlank()) {
+            throw new InvalidInputException("❌ Decoration material cannot be empty.");
+        }
+
+        findRoomById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("❌ Room ID not found."));
 
         Decoration decoration = new Decoration(name, material, price, roomId);
         if (!decorationDao.save(decoration)) {

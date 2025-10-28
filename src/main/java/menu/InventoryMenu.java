@@ -158,15 +158,35 @@ public class InventoryMenu {
 
 
     private void addDecoration() {
+        List<model.Room> rooms;
         try {
+            rooms = inventoryService.getAllRooms();
+        } catch (RoomNotFoundException e) {
+            System.out.println("⚠️ No rooms available. Please create one first.");
+            return;
+        }
+
+        System.out.println("\n=== Available Rooms ===");
+        rooms.forEach(r ->
+                System.out.printf("ID: %d | Name: %s | Difficulty: %s%n",
+                        r.getId(), r.getName(), r.getDifficulty())
+        );
+
+        try {
+            System.out.print("\nEnter related Room ID: ");
+            int roomId = InputUtils.readInt(scanner);
+
+            boolean roomExists = rooms.stream().anyMatch(r -> r.getId() == roomId);
+            if (!roomExists) {
+                System.out.println("❌ Invalid Room ID. Operation cancelled.");
+                return;
+            }
+
             System.out.print("Enter decoration name: ");
             String name = InputUtils.readNonEmptyString(scanner);
 
             System.out.print("Enter material: ");
             String material = InputUtils.readNonEmptyString(scanner);
-
-            System.out.print("Enter related Room ID: ");
-            int roomId = InputUtils.readInt(scanner);
 
             System.out.print("Enter decoration price (€): ");
             double price = InputUtils.readDouble(scanner);
