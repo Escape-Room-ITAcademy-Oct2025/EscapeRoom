@@ -1,20 +1,25 @@
 package menu;
 
+import model.Room;
+import service.InventoryService;
 import service.SalesService;
 import utils.InputUtils;
 import exception.InvalidDataException;
 import exception.DataNotFoundException;
 import exception.OperationFailedException;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class SalesMenu {
 
     private final SalesService salesService;
+    private final InventoryService inventoryService;
     private final Scanner scanner;
 
     public SalesMenu(Scanner scanner) {
         this.salesService = new SalesService();
+        this.inventoryService = InventoryService.getInstance();
         this.scanner = scanner;
     }
 
@@ -60,25 +65,47 @@ public class SalesMenu {
     }
 
     private void sellTicketFlow() {
+        List<Room> rooms;
         try {
+            rooms = inventoryService.getAllRooms();
+        } catch (DataNotFoundException e) {
+            System.out.println("⚠️ No rooms available for ticket sale. Please create one first.");
+            return;
+        }
+
+        System.out.println("\n=== Available Rooms ===");
+        rooms.forEach(r ->
+                System.out.printf("ID: %d | Name: %s | Difficulty: %s | Price: %.2f €%n",
+                        r.getId(), r.getName(), r.getDifficulty(), r.getPrice())
+        );
+
+        try {
+            System.out.print("\nEnter room ID: ");
+            int roomId = InputUtils.readInt(scanner);
+
             System.out.print("Enter player name: ");
             String name = InputUtils.readNonEmptyString(scanner);
 
             System.out.print("Enter player email: ");
             String email = InputUtils.readNonEmptyString(scanner);
 
-            System.out.print("Enter room ID: ");
-            int roomId = InputUtils.readInt(scanner);
+            boolean roomExists = rooms.stream().anyMatch(r -> r.getId() == roomId);
+            if (!roomExists) {
+                System.out.println("❌ Invalid Room ID. Operation cancelled.");
+                return;
+            }
 
             System.out.print("Enter ticket price (€): ");
             double price = InputUtils.readDouble(scanner);
 
             String result = salesService.sellTicket(name, email, roomId, price);
             System.out.println("\n" + result);
+
         } catch (InvalidDataException | DataNotFoundException | OperationFailedException e) {
             System.out.println(e.getMessage());
         }
     }
+
 
     private void showTotalRevenue() {
         try {
