@@ -37,7 +37,8 @@ CREATE TABLE decoration (
 CREATE TABLE player (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL
+    email VARCHAR(150) UNIQUE NOT NULL,
+    subscribed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE ticket (
@@ -59,7 +60,7 @@ CREATE TABLE reward (
     FOREIGN KEY (player_id) REFERENCES player(id) ON DELETE SET NULL
 );
 
--- Datos de ejemplo
+-- Example data
 INSERT INTO escape_room (name) VALUES ('Hogwarts Escape Adventure');
 
 INSERT INTO room (name, difficulty, price, escape_room_id) VALUES
@@ -77,10 +78,10 @@ INSERT INTO decoration (name, material, price, room_id) VALUES
 ('Flying Broom', 'Wood', 250.00, 2),
 ('Golden Snitch', 'Gold', 300.00, 3);
 
-INSERT INTO player (name, email) VALUES
-('Harry Potter', 'harry@hogwarts.edu'),
-('Hermione Granger', 'hermione@hogwarts.edu'),
-('Ron Weasley', 'ron@hogwarts.edu');
+INSERT INTO player (name, email, subscribed) VALUES
+('Harry Potter', 'harry@example.com', TRUE),
+('Hermione Granger', 'hermione@example.com', FALSE),
+('Ron Weasley', 'ron@example.com', TRUE);
 
 INSERT INTO ticket (player_id, room_id, price) VALUES
 (1, 1, 45.00),
