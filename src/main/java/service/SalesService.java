@@ -119,6 +119,14 @@ public class SalesService {
         return "✅ Player registered successfully (not subscribed).";
     }
 
+    public List<Player> findAllPlayers() {
+        List<Player> players = playerDao.findAll();
+        if (players == null || players.isEmpty()) {
+            throw new DataNotFoundException("⚠️ No players found.");
+        }
+        return players;
+    }
+
     public String subscribeExistingPlayer(String email) {
         Optional<Player> playerOpt = playerDao.findByEmail(email);
         if (playerOpt.isEmpty()) {
