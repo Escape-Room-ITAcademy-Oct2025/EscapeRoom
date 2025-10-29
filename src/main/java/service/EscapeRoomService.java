@@ -99,6 +99,6 @@ public class EscapeRoomService implements Subject {
         notifyObservers("[UPDATE] Unfortunately the escape room " + er.getName() +
                 " has been deleted");
 
-        return "✅ Escape Room deleted successfully: " + er.getName();
+        return "🗑️ Escape Room '" + er.getName() + "' and its associated rooms were deleted successfully.";
     }
 }

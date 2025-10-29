@@ -341,7 +341,7 @@ public class InventoryMenu {
                     decoration.getName());
             String confirm = scanner.nextLine().trim().toLowerCase();
 
-            if (!(confirm.equals("yes") || confirm.equals("y"))) {
+            if (!(confirm.equals("yes"))) {
                 System.out.println("❎ Deletion cancelled.");
                 return;
             }

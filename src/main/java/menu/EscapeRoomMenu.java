@@ -1,10 +1,13 @@
 package menu;
 
+import model.EscapeRoom;
 import service.EscapeRoomService;
 import utils.InputUtils;
 import exception.*;
 
 import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class EscapeRoomMenu {
@@ -76,19 +79,56 @@ public class EscapeRoomMenu {
     }
 
     private void deleteEscapeRoom() {
+        System.out.println("\n=== 🗑️ DELETE ESCAPE ROOM ===");
+
+        List<EscapeRoom> escapeRooms;
         try {
-            System.out.print("Enter the ID of the Escape Room to delete: ");
+            escapeRooms = escapeRoomService.findAllEscapeRooms();
+        } catch (DataNotFoundException e) {
+            System.out.println("⚠️ No Escape Rooms available to delete.");
+            return;
+        }
+
+        System.out.println("\n=== Available Escape Rooms ===");
+        escapeRooms.forEach(er ->
+                System.out.printf("ID: %d | Name: %s%n", er.getId(), er.getName())
+        );
+
+        try {
+            System.out.print("\nEnter Escape Room ID to delete: ");
             int id = InputUtils.readInt(scanner);
+
+            Optional<EscapeRoom> erOpt = escapeRooms.stream()
+                    .filter(er -> er.getId() == id)
+                    .findFirst();
+
+            if (erOpt.isEmpty()) {
+                System.out.println("❌ Invalid Escape Room ID. Operation cancelled.");
+                return;
+            }
+
+            EscapeRoom escapeRoom = erOpt.get();
+            System.out.printf(
+                    "⚠️ Are you sure you want to delete '%s'? This will also remove its associated rooms and items. (yes/no): ",
+                    escapeRoom.getName()
+            );
+            String confirm = scanner.nextLine().trim().toLowerCase();
+
+            if (!(confirm.equals("yes"))) {
+                System.out.println("❎ Deletion cancelled.");
+                return;
+            }
 
             System.out.println(escapeRoomService.deleteEscapeRoomById(id));
 
         } catch (InputMismatchException e) {
-            System.out.println("⚠️ Invalid ID. Enter a correct number.");
+            System.out.println("⚠️ Invalid ID format.");
             scanner.nextLine();
         } catch (DataNotFoundException | OperationFailedException e) {
             System.out.println(e.getMessage());
         } catch (Exception e) {
-            System.out.println("⚠️ Unexpected error deleting escape room.");
+            System.out.println("⚠️ Unexpected error deleting Escape Room.");
         }
     }
+
 }
