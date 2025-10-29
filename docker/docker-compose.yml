@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: escaperoom-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: escape_room_db
+      MYSQL_USER: escaperoom
+      MYSQL_PASSWORD: escaperoom123
+    ports:
+      - "3307:3306"
+    volumes:
+      - escaperoom_data:/var/lib/mysql
+      # Opcional: ejecuta scripts al iniciar por 1ª vez
+      - ./docker/init:/docker-entrypoint-initdb.d
+    command: ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  escaperoom_data:
