@@ -132,14 +132,23 @@ public class SalesService {
     }
 
     public String subscribeExistingPlayer(String email) {
-        Player player = playerDao.findByEmail(email)
-                .orElseThrow(() -> new DataNotFoundException("❌ No player found with email: " + email));
-
-        if (!player.isSubscribed()) {
-            playerDao.updateSubscriptionStatus(email, true);
-            player.setSubscribed(true);
+        Optional<Player> playerOpt = playerDao.findByEmail(email);
+        if (playerOpt.isEmpty()) {
+            throw new DataNotFoundException("❌ No player found with email: " + email);
         }
 
+        Player player = playerOpt.get();
+
+        if (player.isSubscribed()) {
+            return "⚠️ Player " + player.getName() + " is already subscribed to updates.";
+        }
+
+        boolean updated = playerDao.updateSubscriptionStatus(email, true);
+        if (!updated) {
+            throw new OperationFailedException("❌ Could not update subscription status for player.");
+        }
+
+        player.setSubscribed(true);
         escapeRoomService.registerObserver(player);
         inventoryService.registerObserver(player);
 
@@ -147,18 +156,27 @@ public class SalesService {
     }
 
     public String unsubscribePlayer(String email) {
-        Player player = playerDao.findByEmail(email)
-                .orElseThrow(() -> new DataNotFoundException("❌ No player found with email: " + email));
-
-        if (player.isSubscribed()) {
-            playerDao.updateSubscriptionStatus(email, false);
-            player.setSubscribed(false);
+        Optional<Player> playerOpt = playerDao.findByEmail(email);
+        if (playerOpt.isEmpty()) {
+            throw new DataNotFoundException("❌ No player found with email: " + email);
         }
 
+        Player player = playerOpt.get();
+
+        if (!player.isSubscribed()) {
+            return "⚠️ Player " + player.getName() + " is already unsubscribed.";
+        }
+
+        boolean updated = playerDao.updateSubscriptionStatus(email, false);
+        if (!updated) {
+            throw new OperationFailedException("❌ Could not update subscription status for player.");
+        }
+
+        player.setSubscribed(false);
         escapeRoomService.removeObserver(player);
         inventoryService.removeObserver(player);
 
-        return "🛑 Player " + player.getName() + " unsubscribed from Escape Room updates.";
+        return "🛑 Player " + player.getName() + " unsubscribed from updates.";
     }
 
     public void restorePlayerSubscriptions() {
