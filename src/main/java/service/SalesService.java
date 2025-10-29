@@ -9,9 +9,6 @@ import exception.OperationFailedException;
 import model.Player;
 import model.Room;
 import model.Ticket;
-import model.observer.Observer;
-import service.InventoryService;
-import service.EscapeRoomService;
 
 import java.util.List;
 import java.util.Optional;
@@ -86,10 +83,6 @@ public class SalesService {
         return tickets;
     }
 
-    public Optional<Ticket> findTicketById(int id) {
-        return ticketDao.findById(id);
-    }
-
     public double calculateTotalRevenue() {
         return ticketDao.findAll()
                 .stream()
@@ -97,11 +90,6 @@ public class SalesService {
                 .sum();
     }
 
-    public boolean deleteTicketById(int id) {
-        Optional<Ticket> ticketOpt = ticketDao.findById(id);
-        return ticketOpt.map(ticketDao::remove)
-                .orElseThrow(() -> new DataNotFoundException("❌ Ticket not found with ID: " + id));
-    }
     public String registerNewPlayer(String name, String email, boolean subscribe) {
         if (name == null || name.isBlank()) {
             throw new InvalidDataException("❌ Player name cannot be empty.");
