@@ -49,7 +49,7 @@ public class SalesService {
         if (existingPlayer.isPresent()) {
             player = existingPlayer.get();
         } else {
-            Player newPlayer = new Player(playerName, playerEmail);
+            Player newPlayer = new Player(playerName, playerEmail,false);
             boolean created = playerDao.save(newPlayer);
             if (!created) {
                 throw new OperationFailedException("❌ Could not create player.");
@@ -114,7 +114,7 @@ public class SalesService {
             throw new OperationFailedException("⚠️ A player with this email already exists.");
         }
 
-        Player newPlayer = new Player(name, email);
+        Player newPlayer = new Player(name, email,subscribe);
         boolean created = playerDao.save(newPlayer);
 
         if (!created) {
@@ -122,6 +122,7 @@ public class SalesService {
         }
 
         if (subscribe) {
+            playerDao.updateSubscriptionStatus(email, true);
             escapeRoomService.registerObserver(newPlayer);
             inventoryService.registerObserver(newPlayer);
             return "✅ Player registered and subscribed to Escape Room updates.";
@@ -137,6 +138,17 @@ public class SalesService {
         }
 
         Player player = playerOpt.get();
+
+        if (player.isSubscribed()) {
+            return "⚠️ Player " + player.getName() + " is already subscribed to updates.";
+        }
+
+        boolean updated = playerDao.updateSubscriptionStatus(email, true);
+        if (!updated) {
+            throw new OperationFailedException("❌ Could not update subscription status for player.");
+        }
+
+        player.setSubscribed(true);
         escapeRoomService.registerObserver(player);
         inventoryService.registerObserver(player);
 
@@ -150,10 +162,30 @@ public class SalesService {
         }
 
         Player player = playerOpt.get();
+
+        if (!player.isSubscribed()) {
+            return "⚠️ Player " + player.getName() + " is already unsubscribed.";
+        }
+
+        boolean updated = playerDao.updateSubscriptionStatus(email, false);
+        if (!updated) {
+            throw new OperationFailedException("❌ Could not update subscription status for player.");
+        }
+
+        player.setSubscribed(false);
         escapeRoomService.removeObserver(player);
         inventoryService.removeObserver(player);
 
-        return "🛑 Player " + player.getName() + " unsubscribed from Escape Room updates.";
+        return "🛑 Player " + player.getName() + " unsubscribed from updates.";
     }
 
+    public void restorePlayerSubscriptions() {
+        List<Player> allPlayers = playerDao.findAll();
+        allPlayers.stream()
+                .filter(Player::isSubscribed)
+                .forEach(player -> {
+                    escapeRoomService.registerObserver(player);
+                    inventoryService.registerObserver(player);
+                });
+    }
 }

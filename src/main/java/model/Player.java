@@ -7,19 +7,22 @@ public class Player implements Observer {
     private int id;
     private String name;
     private String email;
+    private boolean subscribed;
 
     public Player() {
     }
 
-    public Player(int id, String name, String email) {
+    public Player(int id, String name, String email, boolean subscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.subscribed = subscribed;
     }
 
-    public Player(String name, String email) {
+    public Player(String name, String email, boolean subscribed) {
         this.name = name;
         this.email = email;
+        this.subscribed = subscribed;
     }
 
     public int getId() {
@@ -46,6 +49,14 @@ public class Player implements Observer {
         this.email = email;
     }
 
+    public boolean isSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
+    }
+
     @Override
     public void update(String eventMessage) {
         System.out.println("📢 Notification for " + name + ": " + eventMessage);
@@ -57,6 +68,7 @@ public class Player implements Observer {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", subscribed='" + subscribed +
                 '}';
     }
 }

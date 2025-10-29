@@ -1,5 +1,6 @@
 package menu;
 
+import service.SalesService;
 import utils.InputUtils;
 
 import java.util.Scanner;
@@ -11,6 +12,7 @@ public class AdminMenu {
     private final InventoryMenu inventoryMenu;
     private final SalesMenu salesMenu;
     private final CertificateMenu certificateMenu;
+    private final SalesService salesService;
 
     public AdminMenu() {
         this.scanner = new Scanner(System.in);
@@ -18,6 +20,9 @@ public class AdminMenu {
         this.inventoryMenu = new InventoryMenu(scanner);
         this.salesMenu = new SalesMenu(scanner);
         this.certificateMenu = new CertificateMenu(scanner);
+        this.salesService = new SalesService();
+
+        salesService.restorePlayerSubscriptions();
     }
 
     public void start() {

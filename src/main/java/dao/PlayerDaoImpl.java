@@ -16,13 +16,14 @@ public class PlayerDaoImpl implements GenericDao<Player> {
 
     @Override
     public boolean save(Player player) {
-        String sql = "INSERT INTO player (name, email) VALUES (?, ?)";
+        String sql = "INSERT INTO player (name, email, subscribed) VALUES (?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, player.getName());
             stmt.setString(2, player.getEmail());
+            stmt.setBoolean(3, player.isSubscribed());
             int rows = stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -42,7 +43,7 @@ public class PlayerDaoImpl implements GenericDao<Player> {
     @Override
     public List<Player> findAll() {
         List<Player> players = new ArrayList<>();
-        String sql = "SELECT id, name, email FROM player";
+        String sql = "SELECT id, name, email, subscribed FROM player";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -52,7 +53,8 @@ public class PlayerDaoImpl implements GenericDao<Player> {
                 Player player = new Player(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("email")
+                        rs.getString("email"),
+                        rs.getBoolean("subscribed")
                 );
                 players.add(player);
             }
@@ -66,7 +68,7 @@ public class PlayerDaoImpl implements GenericDao<Player> {
 
     @Override
     public Optional<Player> findById(int id) {
-        String sql = "SELECT id, name, email FROM player WHERE id = ?";
+        String sql = "SELECT id, name, email, subscribed FROM player WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -77,7 +79,8 @@ public class PlayerDaoImpl implements GenericDao<Player> {
                     Player player = new Player(
                             rs.getInt("id"),
                             rs.getString("name"),
-                            rs.getString("email")
+                            rs.getString("email"),
+                            rs.getBoolean("subscribed")
                     );
                     return Optional.of(player);
                 }
@@ -91,7 +94,7 @@ public class PlayerDaoImpl implements GenericDao<Player> {
     }
 
     public Optional<Player> findByEmail(String email) {
-        String sql = "SELECT id, name, email FROM player WHERE email = ?";
+        String sql = "SELECT id, name, email, subscribed FROM player WHERE email = ?";
 
         try (Connection conn = DatabaseConfig.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -103,7 +106,8 @@ public class PlayerDaoImpl implements GenericDao<Player> {
                     Player player = new Player(
                             rs.getInt("id"),
                             rs.getString("name"),
-                            rs.getString("email")
+                            rs.getString("email"),
+                            rs.getBoolean("subscribed")
                     );
                     return Optional.of(player);
                 }
@@ -129,6 +133,23 @@ public class PlayerDaoImpl implements GenericDao<Player> {
 
         } catch (SQLException e) {
             System.err.println("Error deleting Player: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateSubscriptionStatus(String email, boolean subscribed) {
+        String sql = "UPDATE player SET subscribed = ? WHERE email = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBoolean(1, subscribed);
+            stmt.setString(2, email);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error updating subscription status: " + e.getMessage());
             return false;
         }
     }
