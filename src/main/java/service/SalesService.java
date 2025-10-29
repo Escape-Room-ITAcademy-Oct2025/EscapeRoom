@@ -49,7 +49,7 @@ public class SalesService {
         if (existingPlayer.isPresent()) {
             player = existingPlayer.get();
         } else {
-            Player newPlayer = new Player(playerName, playerEmail);
+            Player newPlayer = new Player(playerName, playerEmail,false);
             boolean created = playerDao.save(newPlayer);
             if (!created) {
                 throw new OperationFailedException("❌ Could not create player.");
@@ -114,7 +114,7 @@ public class SalesService {
             throw new OperationFailedException("⚠️ A player with this email already exists.");
         }
 
-        Player newPlayer = new Player(name, email);
+        Player newPlayer = new Player(name, email,subscribe);
         boolean created = playerDao.save(newPlayer);
 
         if (!created) {
@@ -122,6 +122,7 @@ public class SalesService {
         }
 
         if (subscribe) {
+            playerDao.updateSubscriptionStatus(email, true);
             escapeRoomService.registerObserver(newPlayer);
             inventoryService.registerObserver(newPlayer);
             return "✅ Player registered and subscribed to Escape Room updates.";
@@ -131,12 +132,14 @@ public class SalesService {
     }
 
     public String subscribeExistingPlayer(String email) {
-        Optional<Player> playerOpt = playerDao.findByEmail(email);
-        if (playerOpt.isEmpty()) {
-            throw new DataNotFoundException("❌ No player found with email: " + email);
+        Player player = playerDao.findByEmail(email)
+                .orElseThrow(() -> new DataNotFoundException("❌ No player found with email: " + email));
+
+        if (!player.isSubscribed()) {
+            playerDao.updateSubscriptionStatus(email, true);
+            player.setSubscribed(true);
         }
 
-        Player player = playerOpt.get();
         escapeRoomService.registerObserver(player);
         inventoryService.registerObserver(player);
 
@@ -144,12 +147,14 @@ public class SalesService {
     }
 
     public String unsubscribePlayer(String email) {
-        Optional<Player> playerOpt = playerDao.findByEmail(email);
-        if (playerOpt.isEmpty()) {
-            throw new DataNotFoundException("❌ No player found with email: " + email);
+        Player player = playerDao.findByEmail(email)
+                .orElseThrow(() -> new DataNotFoundException("❌ No player found with email: " + email));
+
+        if (player.isSubscribed()) {
+            playerDao.updateSubscriptionStatus(email, false);
+            player.setSubscribed(false);
         }
 
-        Player player = playerOpt.get();
         escapeRoomService.removeObserver(player);
         inventoryService.removeObserver(player);
 
