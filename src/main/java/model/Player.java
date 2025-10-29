@@ -12,14 +12,14 @@ public class Player implements Observer {
     public Player() {
     }
 
-    public Player(int id, String name, String email) {
+    public Player(int id, String name, String email, boolean subscribed) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.subscribed = subscribed;
     }
 
-    public Player(String name, String email) {
+    public Player(String name, String email, boolean subscribed) {
         this.name = name;
         this.email = email;
         this.subscribed = subscribed;
