@@ -38,6 +38,7 @@ public class SalesMenu {
                     case 4 -> registerNewPlayerFlow();
                     case 5 -> subscribeExistingPlayerFlow();
                     case 6 -> unsubscribePlayerFlow();
+                    case 7 -> listPlayers();
                     case 0 -> System.out.println("Returning to Admin Menu...");
                     default -> System.out.println("❌ Invalid option, try again.");
                 }
@@ -60,6 +61,7 @@ public class SalesMenu {
         System.out.println("4. Register new player");
         System.out.println("5. Subscribe existing player to updates");
         System.out.println("6. Unsubscribe player from updates");
+        System.out.println("7. Show all players");
         System.out.println("0. Return to Admin Menu");
         System.out.print("Select an option: ");
     }
@@ -167,4 +169,22 @@ public class SalesMenu {
             System.out.println(e.getMessage());
         }
     }
+
+    private void listPlayers() {
+        try {
+            System.out.println("\n=== 👥 REGISTERED PLAYERS ===");
+            salesService.findAllPlayers().forEach(p ->
+                    System.out.printf("ID: %d | Name: %s | Email: %s | Subscribed: %s%n",
+                            p.getId(),
+                            p.getName(),
+                            p.getEmail(),
+                            p.isSubscribed() ? "✅" : "❌")
+            );
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("⚠️ Unexpected error listing players: " + e.getMessage());
+        }
+    }
+
 }
