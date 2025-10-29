@@ -161,4 +161,13 @@ public class SalesService {
         return "🛑 Player " + player.getName() + " unsubscribed from Escape Room updates.";
     }
 
+    public void restorePlayerSubscriptions() {
+        List<Player> allPlayers = playerDao.findAll();
+        allPlayers.stream()
+                .filter(Player::isSubscribed)
+                .forEach(player -> {
+                    escapeRoomService.registerObserver(player);
+                    inventoryService.registerObserver(player);
+                });
+    }
 }
