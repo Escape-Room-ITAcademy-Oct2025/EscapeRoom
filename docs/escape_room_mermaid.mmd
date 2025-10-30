@@ -1,0 +1,459 @@
+classDiagram
+%% Auto-generated from your project structure
+    class Main {
+        + main(String[]) : void
+    }
+    class DatabaseConfig {
+        - instance : DatabaseConfig
+        - url : String
+        - user : String
+        - password : String
+        ~ instance : return
+        ~ DatabaseConfig() : private
+        + getInstance() : DatabaseConfig
+    }
+    class DecorationDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ decorations : return
+        ~ sql : String
+        ~ sql : String
+        ~ false : return
+        + save(Decoration) : boolean
+        + findAll() : List<Decoration>
+        + findById(int) : Optional<Decoration>
+        + remove(Decoration) : boolean
+    }
+    class EscapeRoomDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ escapeRooms : return
+        ~ sql : String
+        ~ sql : String
+        ~ false : return
+        + save(EscapeRoom) : boolean
+        + findAll() : List<EscapeRoom>
+        + findById(int) : Optional<EscapeRoom>
+        + remove(EscapeRoom) : boolean
+    }
+    class GenericDao {
+        <<interface>>
+    }
+    class HintDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ hints : return
+        ~ sql : String
+        ~ sql : String
+        ~ false : return
+        + save(Hint) : boolean
+        + findAll() : List<Hint>
+        + findById(int) : Optional<Hint>
+        + remove(Hint) : boolean
+    }
+    class PlayerDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ players : return
+        ~ sql : String
+        ~ sql : String
+        ~ sql : String
+        ~ false : return
+        + save(Player) : boolean
+        + findAll() : List<Player>
+        + findById(int) : Optional<Player>
+        + findByEmail(String) : Optional<Player>
+        + remove(Player) : boolean
+        + updateSubscriptionStatus(String, boolean) : boolean
+    }
+    class RewardDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ rewards : return
+        ~ sql : String
+        ~ sql : String
+        ~ false : return
+        + save(Reward) : boolean
+        + findAll() : List<Reward>
+        + findById(int) : Optional<Reward>
+        + remove(Reward) : boolean
+    }
+    class RoomDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ rooms : return
+        ~ sql : String
+        ~ sql : String
+        ~ rooms : return
+        ~ sql : String
+        + save(Room) : boolean
+        + findAll() : List<Room>
+        + findById(int) : Optional<Room>
+        + findByEscapeRoomId(int) : List<Room>
+        + remove(Room) : boolean
+    }
+    class TicketDaoImpl {
+        ~ rows : return
+        ~ false : return
+        ~ sql : String
+        ~ tickets : return
+        ~ sql : String
+        ~ sql : String
+        ~ tickets : return
+        ~ sql : String
+        + save(Ticket) : boolean
+        + findAll() : List<Ticket>
+        + findById(int) : Optional<Ticket>
+        + findByPlayerId(int) : List<Ticket>
+        + remove(Ticket) : boolean
+    }
+    class DataNotFoundException {
+        ~ DataNotFoundException(String) : public
+    }
+    class DatabaseOperationException {
+        ~ DatabaseOperationException(String) : public
+    }
+    class DecorationNotFoundException {
+        ~ DecorationNotFoundException(String) : public
+    }
+    class EscapeRoomNotFoundException {
+        ~ EscapeRoomNotFoundException(String) : public
+    }
+    class HintNotFoundException {
+        ~ HintNotFoundException(String) : public
+    }
+    class InvalidDataException {
+        ~ InvalidDataException(String) : public
+    }
+    class InvalidInputException {
+        ~ InvalidInputException(String) : public
+    }
+    class OperationFailedException {
+        ~ OperationFailedException(String) : public
+    }
+    class PlayerNotFoundException {
+        ~ PlayerNotFoundException(String) : public
+    }
+    class RoomNotFoundException {
+        ~ RoomNotFoundException(String) : public
+    }
+    class TicketNotFoundException {
+        ~ TicketNotFoundException(String) : public
+    }
+    class AdminMenu {
+        - scanner : Scanner
+        - escapeRoomMenu : EscapeRoomMenu
+        - inventoryMenu : InventoryMenu
+        - salesMenu : SalesMenu
+        - certificateMenu : CertificateMenu
+        - salesService : SalesService
+        ~ option : int
+        ~ AdminMenu() : public
+        + start() : void
+        - printMenuOptions() : void
+    }
+    class CertificateMenu {
+        - certificateService : CertificateService
+        - scanner : Scanner
+        ~ option : int
+        ~ CertificateMenu(Scanner) : public
+        + start() : void
+        - printMenuOptions() : void
+    }
+    class EscapeRoomMenu {
+        - escapeRoomService : EscapeRoomService
+        - scanner : Scanner
+        ~ option : int
+        ~ escapeRooms : List<EscapeRoom>
+        ~ EscapeRoomMenu(Scanner) : public
+        + start() : void
+        - printMenuOptions() : void
+        - createEscapeRoom() : void
+        - listEscapeRooms() : void
+        - deleteEscapeRoom() : void
+    }
+    class InventoryMenu {
+        - inventoryService : InventoryService
+        - escapeRoomService : EscapeRoomService
+        - scanner : Scanner
+        ~ option : int
+        ~ escapeRooms : List<EscapeRoom>
+        ~ rooms : List<Room>
+        ~ rooms : List<model.Room>
+        ~ rooms : List<Room>
+        ~ InventoryMenu(Scanner) : public
+        + start() : void
+        - printMenu() : void
+        - addRoom() : void
+        - addHint() : void
+        - addDecoration() : void
+    }
+    class SalesMenu {
+        - salesService : SalesService
+        - inventoryService : InventoryService
+        - scanner : Scanner
+        ~ option : int
+        ~ rooms : List<Room>
+        ~ SalesMenu(Scanner) : public
+        + start() : void
+        - printMenuOptions() : void
+        - sellTicketFlow() : void
+        - showTotalRevenue() : void
+        - listTickets() : void
+    }
+    class Decoration {
+        - id : int
+        - name : String
+        - material : String
+        - price : double
+        - roomId : int
+        ~ id : return
+        ~ name : return
+        ~ material : return
+        ~ Decoration() : public
+        ~ Decoration(int, String, String, double, int) : public
+        ~ Decoration(String, String, double, int) : public
+        + getId() : int
+        + setId(int) : void
+        + getName() : String
+    }
+    class Difficulty {
+        <<enumeration>>
+    }
+    class EscapeRoom {
+        - id : int
+        - name : String
+        ~ EscapeRoom() : public
+        ~ EscapeRoom(String) : public
+        + getId() : int
+        + setId(int) : void
+        + getName() : String
+        + setName(String) : void
+    }
+    class Hint {
+        - id : int
+        - description : String
+        - theme : String
+        - roomId : int
+        - price : double
+        ~ id : return
+        ~ description : return
+        ~ theme : return
+        ~ Hint() : public
+        ~ Hint(int, String, String, int, double) : public
+        ~ Hint(String, String, int, double) : public
+        + getId() : int
+        + setId(int) : void
+        + getDescription() : String
+    }
+    class Player {
+        - id : int
+        - name : String
+        - email : String
+        - subscribed : boolean
+        ~ id : return
+        ~ name : return
+        ~ email : return
+        ~ subscribed : return
+        ~ Player() : public
+        ~ Player(int, String, String, boolean) : public
+        ~ Player(String, String, boolean) : public
+        + getId() : int
+        + setId(int) : void
+        + getName() : String
+    }
+    class Reward {
+        - id : int
+        - playerId : int
+        - name : String
+        - description : String
+        - dateAwarded : LocalDateTime
+        ~ Reward() : public
+        ~ Reward(int, int, String, String, LocalDateTime) : public
+        ~ Reward(int, String, String) : public
+        + getId() : int
+        + setId(int) : void
+        + getPlayerId() : int
+    }
+    class RewardType {
+        <<enumeration>>
+        - name : String
+        - description : String
+        ~ name : return
+        + getName() : String
+        + getDescription() : String
+        + toString() : String
+    }
+    class Room {
+        - id : int
+        - name : String
+        - difficulty : Difficulty
+        - price : double
+        - escapeRoomId : int
+        ~ id : return
+        ~ name : return
+        ~ difficulty : return
+        ~ Room() : public
+        ~ Room(int, String, Difficulty, double) : public
+        ~ Room(String, Difficulty, double) : public
+        + getId() : int
+        + setId(int) : void
+        + getName() : String
+    }
+    class Ticket {
+        - id : int
+        - playerId : int
+        - roomId : int
+        - purchaseDate : LocalDateTime
+        - price : double
+        ~ Ticket() : public
+        ~ Ticket(int, int, int, LocalDateTime, double) : public
+        ~ Ticket(int, int, double) : public
+        + getId() : int
+        + setId(int) : void
+        + getPlayerId() : int
+    }
+    class Observer {
+        <<interface>>
+    }
+    class Subject {
+        <<interface>>
+    }
+    class CertificateService {
+        - playerDao : PlayerDaoImpl
+        - roomDao : RoomDaoImpl
+        - ticketDao : TicketDaoImpl
+        - rewardDao : RewardDaoImpl
+        ~ choice : int
+        ~ selected : RewardType
+        ~ selected : return
+        ~ CertificateService() : public
+        + startCertificateFlow(Scanner) : void
+        + generateCertificateFromTicket(int, Scanner) : Optional<String>
+        - askForReward(Scanner) : RewardType
+    }
+    class EscapeRoomService {
+        - instance : EscapeRoomService
+        ~ instance : return
+        - escapeRoomDao : EscapeRoomDaoImpl
+        ~ rooms : return
+        + getInstance() : EscapeRoomService
+        ~ EscapeRoomService() : private
+        + registerObserver(Observer) : void
+        + removeObserver(Observer) : void
+        + notifyObservers(String) : void
+        + createEscapeRoom(String) : String
+    }
+    class InventoryService {
+        - instance : InventoryService
+        ~ instance : return
+        - roomDao : RoomDaoImpl
+        - hintDao : HintDaoImpl
+        - decorationDao : DecorationDaoImpl
+        - escapeRoomService : EscapeRoomService
+        ~ rooms : return
+        ~ hints : return
+        + getInstance() : InventoryService
+        ~ InventoryService() : private
+        + registerObserver(Observer) : void
+        + removeObserver(Observer) : void
+        + notifyObservers(String) : void
+        + addRoom(String, String, double, int) : String
+    }
+    class SalesService {
+        - playerDao : PlayerDaoImpl
+        - roomDao : RoomDaoImpl
+        - ticketDao : TicketDaoImpl
+        - inventoryService : InventoryService
+        - escapeRoomService : EscapeRoomService
+        ~ player : Player
+        ~ tickets : return
+        ~ players : return
+        ~ SalesService() : public
+        + sellTicket(String, String, int, double) : String
+        + findAllTickets() : List<Ticket>
+        + calculateTotalRevenue() : double
+        + registerNewPlayer(String, String, boolean) : String
+        + findAllPlayers() : List<Player>
+    }
+    class ConnectionTestTest {
+    }
+    class InputUtils {
+        ~ value : return
+        ~ input : String
+        ~ input : return
+        ~ InputUtils() : private
+        + readInt(Scanner) : int
+        + readDouble(Scanner) : double
+        + readNonEmptyString(Scanner) : String
+        + pause(Scanner) : void
+    }
+    GenericDao<Decoration> <|.. DecorationDaoImpl
+    GenericDao<EscapeRoom> <|.. EscapeRoomDaoImpl
+    GenericDao<Hint> <|.. HintDaoImpl
+    GenericDao<Player> <|.. PlayerDaoImpl
+    GenericDao<Reward> <|.. RewardDaoImpl
+    GenericDao<Room> <|.. RoomDaoImpl
+    GenericDao<Ticket> <|.. TicketDaoImpl
+    RuntimeException <|-- DataNotFoundException
+    RuntimeException <|-- DatabaseOperationException
+    RuntimeException <|-- DecorationNotFoundException
+    RuntimeException <|-- EscapeRoomNotFoundException
+    RuntimeException <|-- HintNotFoundException
+    RuntimeException <|-- InvalidDataException
+    RuntimeException <|-- InvalidInputException
+    RuntimeException <|-- OperationFailedException
+    RuntimeException <|-- PlayerNotFoundException
+    RuntimeException <|-- RoomNotFoundException
+    RuntimeException <|-- TicketNotFoundException
+    Observer <|.. Player
+    Subject <|.. EscapeRoomService
+    Subject <|.. InventoryService
+    CertificateService --> PlayerDaoImpl
+    CertificateService --> RoomDaoImpl
+    CertificateService --> TicketDaoImpl
+    CertificateService --> RewardDaoImpl
+    EscapeRoomService --> EscapeRoomDaoImpl
+    InventoryService --> RoomDaoImpl
+    InventoryService --> HintDaoImpl
+    InventoryService --> DecorationDaoImpl
+    SalesService --> PlayerDaoImpl
+    SalesService --> RoomDaoImpl
+    SalesService --> TicketDaoImpl
+    DatabaseConfig --> DatabaseConfig
+    AdminMenu --> EscapeRoomMenu
+    AdminMenu --> InventoryMenu
+    AdminMenu --> SalesMenu
+    AdminMenu --> CertificateMenu
+    AdminMenu --> SalesService
+    CertificateMenu --> CertificateService
+    EscapeRoomMenu --> EscapeRoomService
+    InventoryMenu --> InventoryService
+    InventoryMenu --> EscapeRoomService
+    SalesMenu --> SalesService
+    SalesMenu --> InventoryService
+    Room --> Difficulty
+    CertificateService --> PlayerDaoImpl
+    CertificateService --> RoomDaoImpl
+    CertificateService --> TicketDaoImpl
+    CertificateService --> RewardDaoImpl
+    CertificateService --> RewardType
+    EscapeRoomService --> EscapeRoomService
+    EscapeRoomService --> EscapeRoomDaoImpl
+    InventoryService --> InventoryService
+    InventoryService --> RoomDaoImpl
+    InventoryService --> HintDaoImpl
+    InventoryService --> DecorationDaoImpl
+    InventoryService --> EscapeRoomService
+    SalesService --> PlayerDaoImpl
+    SalesService --> RoomDaoImpl
+    SalesService --> TicketDaoImpl
+    SalesService --> InventoryService
+    SalesService --> EscapeRoomService
+    SalesService --> Player

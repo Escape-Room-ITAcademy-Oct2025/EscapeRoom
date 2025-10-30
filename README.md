@@ -36,6 +36,189 @@ Below is the database structure for the Escape Room system:
 ![Database UML](docs/db-diagram.png)
 
 ---
+## 🧩 UML Diagram
+
+```mermaid
+%%{init: {'theme': 'neutral', 'flowchart': {'defaultRenderer': 'elk'}} }%%
+classDiagram
+    direction TB
+
+%% ===========================
+%% MODEL
+%% ===========================
+    class EscapeRoom {
+        - id : int
+        - name : String
+        + getId() : int
+        + getName() : String
+        + addRoom(Room)
+    }
+
+    class Room {
+        - id : int
+        - name : String
+        - difficulty : Difficulty
+        - price : double
+        - escapeRoomId : int
+    }
+
+    class Difficulty {
+        <<enumeration>>
+        EASY
+        MEDIUM
+        HARD
+    }
+
+    class Hint {
+        - id : int
+        - description : String
+        - theme : String
+        - price : double
+        - roomId : int
+    }
+
+    class Decoration {
+        - id : int
+        - name : String
+        - material : String
+        - price : double
+        - roomId : int
+    }
+
+    class Player {
+        - id : int
+        - name : String
+        - email : String
+        - subscribed : boolean
+        + update(String) : void
+    }
+
+    class Ticket {
+        - id : int
+        - playerId : int
+        - roomId : int
+        - price : double
+        - purchaseDate : LocalDateTime
+    }
+
+    class Reward {
+        - id : int
+        - playerId : int
+        - name : String
+        - description : String
+        - rewardType : RewardType
+        - dateAwarded : LocalDateTime
+    }
+
+    class RewardType {
+        <<enumeration>>
+        HONOR
+        UNITY
+        PERSISTENCE
+        CREATIVITY
+        STONE
+    }
+
+    class Observer {
+        <<interface>>
+        + update(String) : void
+    }
+
+    class Subject {
+        <<interface>>
+        + subscribe(Observer)
+        + unsubscribe(Observer)
+        + notifyObservers(String)
+    }
+
+    Player ..|> Observer
+    
+%% ===========================
+%% RELATIONSHIPS MODEL
+%% ===========================
+
+    EscapeRoom "1" --> "*" Room
+    Room "1" --> "*" Hint
+    Room "1" --> "*" Decoration
+    Player "1" --> "*" Ticket
+    Player "1" --> "*" Reward
+```
+```mermaid
+%%{init: {'theme': 'neutral', 'flowchart': {'defaultRenderer': 'elk'}} }%%
+classDiagram
+    direction TB
+    
+%% ===========================
+%% DAO
+%% ===========================
+    class GenericDao {
+        <<interface>>
+        + save(T) : boolean
+        + findAll() : List<T>
+        + findById(int) : Optional<T>
+        + remove(T) : boolean
+    }
+
+    class EscapeRoomDaoImpl
+    class RoomDaoImpl
+    class HintDaoImpl
+    class DecorationDaoImpl
+    class PlayerDaoImpl
+    class TicketDaoImpl
+    class RewardDaoImpl
+
+    GenericDao <|.. EscapeRoomDaoImpl
+    GenericDao <|.. RoomDaoImpl
+    GenericDao <|.. HintDaoImpl
+    GenericDao <|.. DecorationDaoImpl
+    GenericDao <|.. PlayerDaoImpl
+    GenericDao <|.. TicketDaoImpl
+    GenericDao <|.. RewardDaoImpl
+
+%% ===========================
+%% SERVICE
+%% ===========================
+    class EscapeRoomService
+    class InventoryService
+    class SalesService
+    class CertificateService
+
+    EscapeRoomService --> EscapeRoomDaoImpl
+    InventoryService --> RoomDaoImpl
+    InventoryService --> HintDaoImpl
+    InventoryService --> DecorationDaoImpl
+    InventoryService ..|> Subject
+    SalesService --> PlayerDaoImpl
+    SalesService --> TicketDaoImpl
+    CertificateService --> PlayerDaoImpl
+    CertificateService --> RoomDaoImpl
+
+%% ===========================
+%% MENU
+%% ===========================
+    class AdminMenu
+    class EscapeRoomMenu
+    class InventoryMenu
+    class SalesMenu
+    class CertificateMenu
+
+    AdminMenu --> EscapeRoomMenu
+    AdminMenu --> InventoryMenu
+    AdminMenu --> SalesMenu
+    AdminMenu --> CertificateMenu
+
+    EscapeRoomMenu --> EscapeRoomService
+    InventoryMenu --> InventoryService
+    SalesMenu --> SalesService
+    CertificateMenu --> CertificateService
+
+%% ===========================
+%% RELATIONSHIPS MODEL
+%% ===========================
+
+```
+
+---
 
 ## 💻 Technologies Used
 
