@@ -34,7 +34,7 @@ Developed as part of the **Java Back-End Development Bootcamp** at *IT Academy B
 Below is the database structure for the Escape Room system:
 
 ![Database UML](docs/db-diagram.png)
-![UML](docs/plantuml_export.puml)
+![UML](docs/escape_room_mermaid.mmd)
 ---
 
 ## 💻 Technologies Used
