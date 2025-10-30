@@ -132,7 +132,12 @@ classDiagram
     }
 
     Player ..|> Observer
-
+```
+```mermaid
+%%{init: {'theme': 'neutral', 'flowchart': {'defaultRenderer': 'elk'}} }%%
+classDiagram
+    direction TB
+    
 %% ===========================
 %% DAO
 %% ===========================
