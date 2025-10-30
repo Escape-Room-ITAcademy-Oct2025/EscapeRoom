@@ -132,6 +132,16 @@ classDiagram
     }
 
     Player ..|> Observer
+    
+%% ===========================
+%% RELATIONSHIPS MODEL
+%% ===========================
+
+    EscapeRoom "1" --> "*" Room
+    Room "1" --> "*" Hint
+    Room "1" --> "*" Decoration
+    Player "1" --> "*" Ticket
+    Player "1" --> "*" Reward
 ```
 ```mermaid
 %%{init: {'theme': 'neutral', 'flowchart': {'defaultRenderer': 'elk'}} }%%
@@ -205,13 +215,6 @@ classDiagram
 %% ===========================
 %% RELATIONSHIPS MODEL
 %% ===========================
-    EscapeRoom "1" --> "*" Room
-    Room "1" --> "*" Hint
-    Room "1" --> "*" Decoration
-    Player "1" --> "*" Ticket
-    Player "1" --> "*" Reward
-    InventoryService ..> Observer : notifies
-    InventoryService ..> Player : subscribed players
 
 ```
 
