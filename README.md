@@ -41,7 +41,7 @@ Below is the database structure for the Escape Room system:
 ```mermaid
 %%{init: {'theme': 'neutral', 'flowchart': {'defaultRenderer': 'elk'}} }%%
 classDiagram
-    direction LR
+    direction TB
 
 %% ===========================
 %% MODEL
