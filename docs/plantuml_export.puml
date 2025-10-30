@@ -1,0 +1,201 @@
+@startuml
+title Escape Room Management System - Final UML Diagram
+
+' ===========================
+'  PACKAGES
+' ===========================
+package model {
+    class EscapeRoom {
+        - id : int
+        - name : String
+        - rooms : List<Room>
+        + getId() : int
+        + getName() : String
+        + getRooms() : List<Room>
+        + addRoom(Room)
+    }
+
+    class Room {
+        - id : int
+        - name : String
+        - difficulty : Difficulty
+        - price : double
+        - escapeRoomId : int
+    }
+
+    enum Difficulty {
+        EASY
+        MEDIUM
+        HARD
+    }
+
+    class Hint {
+        - id : int
+        - description : String
+        - theme : String
+        - price : double
+        - roomId : int
+    }
+
+    class Decoration {
+        - id : int
+        - name : String
+        - material : String
+        - price : double
+        - roomId : int
+    }
+
+    class Player {
+        - id : int
+        - name : String
+        - email : String
+        - subscribed : boolean
+        + update(String) : void
+    }
+
+    class Ticket {
+        - id : int
+        - playerId : int
+        - roomId : int
+        - price : double
+        - purchaseDate : LocalDateTime
+    }
+
+    class Reward {
+        - id : int
+        - playerId : int
+        - name : String
+        - description : String
+        - rewardType : RewardType
+        - dateAwarded : LocalDateTime
+    }
+
+    enum RewardType {
+        HONOR
+        UNITY
+        PERSISTENCE
+        CREATIVITY
+        STONE
+    }
+
+    interface Observer {
+        + update(String) : void
+    }
+
+    interface Subject {
+        + subscribe(Observer)
+        + unsubscribe(Observer)
+        + notifyObservers(String)
+    }
+
+    Player ..|> Observer
+}
+
+' ===========================
+'  DAO
+' ===========================
+package dao {
+    interface GenericDao<T> {
+        + save(T) : boolean
+        + findAll() : List<T>
+        + findById(int) : Optional<T>
+        + remove(T) : boolean
+    }
+
+    class EscapeRoomDaoImpl
+    class RoomDaoImpl
+    class HintDaoImpl
+    class DecorationDaoImpl
+    class PlayerDaoImpl
+    class TicketDaoImpl
+    class RewardDaoImpl
+
+    GenericDao <|.. EscapeRoomDaoImpl
+    GenericDao <|.. RoomDaoImpl
+    GenericDao <|.. HintDaoImpl
+    GenericDao <|.. DecorationDaoImpl
+    GenericDao <|.. PlayerDaoImpl
+    GenericDao <|.. TicketDaoImpl
+    GenericDao <|.. RewardDaoImpl
+}
+
+' ===========================
+'  SERVICE
+' ===========================
+package service {
+    class EscapeRoomService
+    class InventoryService
+    class SalesService
+    class CertificateService
+
+    EscapeRoomService --> dao.EscapeRoomDaoImpl
+    InventoryService --> dao.RoomDaoImpl
+    InventoryService --> dao.HintDaoImpl
+    InventoryService --> dao.DecorationDaoImpl
+    InventoryService ..|> model.Subject
+    SalesService --> dao.PlayerDaoImpl
+    SalesService --> dao.TicketDaoImpl
+    CertificateService --> dao.PlayerDaoImpl
+    CertificateService --> dao.RoomDaoImpl
+}
+
+' ===========================
+'  MENU
+' ===========================
+package menu {
+    class AdminMenu
+    class EscapeRoomMenu
+    class InventoryMenu
+    class SalesMenu
+    class CertificateMenu
+
+    AdminMenu --> EscapeRoomMenu
+    AdminMenu --> InventoryMenu
+    AdminMenu --> SalesMenu
+    AdminMenu --> CertificateMenu
+
+    EscapeRoomMenu --> service.EscapeRoomService
+    InventoryMenu --> service.InventoryService
+    SalesMenu --> service.SalesService
+    CertificateMenu --> service.CertificateService
+}
+
+' ===========================
+'  CONFIG & UTILS
+' ===========================
+package config {
+    class DatabaseConfig {
+        + getConnection() : Connection
+    }
+}
+
+package utils {
+    class InputUtils {
+        + readInt(Scanner) : int
+        + readDouble(Scanner) : double
+        + readNonEmptyString(Scanner, String) : String
+        + pause(Scanner) : void
+    }
+}
+
+' ===========================
+'  MAIN
+' ===========================
+class Main {
+    + main(String[]) : void
+}
+
+Main --> menu.AdminMenu
+
+' ===========================
+'  RELATIONSHIPS MODEL
+' ===========================
+model.EscapeRoom "1" --> "*" model.Room
+model.Room "1" --> "*" model.Hint
+model.Room "1" --> "*" model.Decoration
+model.Player "1" --> "*" model.Ticket
+model.Player "1" --> "*" model.Reward
+model.InventoryService ..> model.Observer : notifies
+model.InventoryService ..> model.Player : subscribed players
+
+@enduml
